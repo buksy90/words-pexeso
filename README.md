@@ -28,6 +28,15 @@ After selecting characters, go to **Generate Words** on the Setup page. Adjust:
 Words are randomly assembled from selected characters using `composables/useWordSetup.ts` ensuring uniqueness and basic diversity (multi-character words must contain at least two distinct letters). Limits: max 50 words, attempts capped to avoid infinite loops.
 
 Next planned steps: 1.3 word confirmation/editing interface.
+Implemented: **1.3 Word Confirmation & Editing**
+
+Use the **Confirm** step to review generated words:
+- Inline edit each word (validation ensures only selected characters are used and word length is within range; longer words require at least 2 distinct characters).
+- Remove unwanted words.
+- Add new custom words manually (must pass same validation rules).
+- Confirm the list (stored in `state.confirmedWords` via `useWordSetup`).
+
+After confirmation, the list is locked (until further edits) and ready for game board generation in phase 2.
 
 ## 🚀 Tech Stack
 

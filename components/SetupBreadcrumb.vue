@@ -32,6 +32,7 @@ interface CrumbItem { title: string; to?: string; disabled: boolean; icon?: stri
 const items = computed<CrumbItem[]>(() => {
   const hasChars = active.value.length > 0;
   const hasWords = state.value.words.length > 0;
+  const canConfirm = hasWords && state.value.words.length > 0;
   return [
     {
       title: 'Characters',
@@ -47,8 +48,8 @@ const items = computed<CrumbItem[]>(() => {
     },
     {
       title: 'Confirm',
-      to: hasWords ? '/setup/confirm' : undefined,
-      disabled: !hasWords,
+      to: canConfirm ? '/setup/confirm' : undefined,
+      disabled: !canConfirm,
       icon: 'mdi-check-circle'
     }
   ];

@@ -66,6 +66,13 @@
       <v-btn variant="text" prepend-icon="mdi-delete" @click="clearWords" :disabled="!state.words.length">Clear</v-btn>
       <v-spacer></v-spacer>
       <v-btn variant="text" prepend-icon="mdi-arrow-left" :to="'/setup'">Back</v-btn>
+      <v-btn
+        color="secondary"
+        class="ml-2"
+        prepend-icon="mdi-arrow-right"
+        :disabled="!state.words.length"
+        :to="state.words.length ? '/setup/confirm' : undefined"
+      >Next</v-btn>
     </div>
 
     <v-row>
