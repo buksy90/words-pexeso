@@ -2,6 +2,17 @@
 
 A Nuxt 3 application with TypeScript and Vuetify built for creating a Pexeso (Memory) card game.
 
+The game aims at helping children learn read first characters and join them in single words.
+
+## Roadmap
+1. Game setup, let player define list of characters that children already know and can be used within game. There should be some "Setup" page with following subpages:
+ - 1.1. Displays characters on keyboard where player can toggle which characters he wants to activate.
+ - 1.2. Player chooses the range of words length and how many words to play with and game generates random words.
+ - 1.3. Player confirms the words or edit them.
+2. Let Player run the game
+ - 2.1 Render pexeso based on the words selected in setup.
+ - 2.2 Read words on pexeso chard when it is chosen.
+
 ## 🚀 Tech Stack
 
 - **Nuxt 3** - The Intuitive Vue Framework
@@ -34,56 +45,3 @@ Build the application for production:
 npm run build
 ```
 
-Preview the production build:
-
-```bash
-npm run preview
-```
-
-Generate static site:
-
-```bash
-npm run generate
-```
-
-## 📁 Project Structure
-
-```
-pexeso/
-├── app.vue              # Main application component
-├── nuxt.config.ts       # Nuxt configuration with Vuetify setup
-├── tsconfig.json        # TypeScript configuration
-├── plugins/
-│   └── vuetify.ts      # Vuetify plugin configuration
-├── public/             # Static assets
-└── package.json        # Project dependencies
-```
-
-## 🎨 Vuetify Configuration
-
-Vuetify is configured with:
-- SSR support enabled
-- Material Design Icons (@mdi/font)
-- Auto-import for components
-- Light theme by default
-
-## 🔧 TypeScript
-
-TypeScript is enabled by default in Nuxt 3. All `.vue`, `.ts`, and `.tsx` files support TypeScript out of the box.
-
-## 📚 Resources
-
-- [Nuxt 3 Documentation](https://nuxt.com/docs)
-- [Vuetify 3 Documentation](https://vuetifyjs.com/)
-- [TypeScript Documentation](https://www.typescriptlang.org/)
-- [Vue 3 Documentation](https://vuejs.org/)
-
-## 🎮 Next Steps
-
-Start building your Pexeso game by:
-1. Creating game components in a `components/` directory
-2. Adding game logic with TypeScript
-3. Styling with Vuetify components
-4. Implementing the memory card matching logic
-
-Happy coding! 🎉
