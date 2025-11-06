@@ -13,6 +13,14 @@ The game aims at helping children learn read first characters and join them in s
  - 2.1 Render pexeso based on the words selected in setup.
  - 2.2 Read words on pexeso chard when it is chosen.
 
+## Current Implementation
+
+Implemented: **1.1 Character Selection**
+
+Navigate to `Setup` (top bar) then **Select Characters** to open the keyboard grid. Click any character button to toggle inclusion. Selected characters are highlighted and stored globally (persisting while the session stays active) via a Nuxt composable in `composables/useCharacters.ts`.
+
+Next planned steps: 1.2 word length & count selection, generation of candidate words using active characters.
+
 ## 🚀 Tech Stack
 
 - **Nuxt 3** - The Intuitive Vue Framework
