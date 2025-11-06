@@ -37,6 +37,7 @@
 
 <script setup lang="ts">
 import { useCharacters } from '~/composables/useCharacters';
+import { onMounted, onBeforeUnmount } from 'vue';
 
 const { active, toggle, isActive, clearAll, selectAll } = useCharacters();
 
@@ -48,6 +49,24 @@ const keyboardRows: string[][] = [
 ];
 
 const allChars = keyboardRows.flat();
+
+// Keyboard interaction: allow physical key press to toggle character
+const handleKey = (e: KeyboardEvent) => {
+  // Ignore if any modifier that typically changes intent
+  if (e.altKey || e.metaKey || e.ctrlKey) return;
+  const key = e.key.toLowerCase();
+  if (allChars.includes(key)) {
+    toggle(key);
+  }
+};
+
+onMounted(() => {
+  window.addEventListener('keydown', handleKey);
+});
+
+onBeforeUnmount(() => {
+  window.removeEventListener('keydown', handleKey);
+});
 </script>
 
 <style scoped>
