@@ -1,4 +1,5 @@
 import type { Ref } from 'vue';
+import { onMounted, watch } from 'vue';
 import { useCharacters } from './useCharacters';
 
 export interface WordSetupState {
@@ -14,8 +15,8 @@ export interface WordSetupState {
 export function useWordSetup() {
   // persistent state across pages
   const state: Ref<WordSetupState> = useState<WordSetupState>('wordSetup', () => ({
-    minLength: 3,
-    maxLength: 5,
+    minLength: 1,
+    maxLength: 4,
     count: 8,
     words: [],
     confirmedWords: [],
@@ -24,6 +25,34 @@ export function useWordSetup() {
   }));
 
   const { active } = useCharacters();
+
+  const STORAGE_KEY = 'pexeso_words_state_v1';
+
+  onMounted(() => {
+    try {
+      const raw = localStorage.getItem(STORAGE_KEY);
+      if (raw) {
+        const parsed = JSON.parse(raw);
+        if (parsed && typeof parsed === 'object') {
+          if (Array.isArray(parsed.words)) state.value.words = parsed.words.filter((w: any) => typeof w === 'string');
+          if (Array.isArray(parsed.confirmedWords)) state.value.confirmedWords = parsed.confirmedWords.filter((w: any) => typeof w === 'string');
+        }
+      }
+    } catch (e) {
+      // ignore malformed data
+    }
+  });
+
+  watch(() => [state.value.words, state.value.confirmedWords], () => {
+    try {
+      localStorage.setItem(STORAGE_KEY, JSON.stringify({
+        words: state.value.words,
+        confirmedWords: state.value.confirmedWords,
+      }));
+    } catch (e) {
+      // quota errors ignored
+    }
+  }, { deep: true });
 
   const generateWords = () => {
     if (!active.value.length) return;
