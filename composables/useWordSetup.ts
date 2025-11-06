@@ -54,6 +54,22 @@ export function useWordSetup() {
     }
   }, { deep: true });
 
+  const isVowel = (char: string): boolean => {
+    return ['a', 'e', 'i', 'o', 'u', 'y'].includes(char.toLowerCase());
+  };
+
+  const hasConsecutiveConsonants = (word: string): boolean => {
+    const chars = word.split('');
+    for (let i = 0; i < chars.length - 1; i++) {
+      const current = chars[i];
+      const next = chars[i + 1];
+      if (current && next && !isVowel(current) && !isVowel(next)) {
+        return true;
+      }
+    }
+    return false;
+  };
+
   const generateWords = () => {
     if (!active.value.length) return;
     if (state.value.minLength < 1) state.value.minLength = 1;
@@ -64,24 +80,74 @@ export function useWordSetup() {
     state.value.generating = true;
 
     const wordsSet = new Set<string>();
-    const maxAttempts = state.value.count * 100; // avoid infinite loops
+    const maxAttempts = state.value.count * 200; // increased attempts due to stricter rules
     let attempts = 0;
 
     while (wordsSet.size < state.value.count && attempts < maxAttempts) {
       const len = randInt(state.value.minLength, state.value.maxLength);
-      let w = '';
-      for (let i = 0; i < len; i++) {
-        w += active.value[randInt(0, active.value.length - 1)];
+      let chars: string[] = [];
+
+      // First letter can be anything
+      const firstCharIndex = randInt(0, active.value.length - 1);
+      const firstChar = active.value[firstCharIndex];
+      if (firstChar) chars.push(firstChar);
+
+      // For remaining letters, ensure no consecutive consonants
+      let validWord = firstChar !== undefined;
+      if (validWord) {
+        for (let i = 1; i < len; i++) {
+          let validChar = false;
+          let charAttempts = 0;
+          const maxCharAttempts = 20;
+          const prevChar = chars[i - 1];
+
+          while (!validChar && charAttempts < maxCharAttempts && prevChar) {
+            const nextCharIndex = randInt(0, active.value.length - 1);
+            const nextChar = active.value[nextCharIndex];
+
+            if (nextChar) {
+              // If last char was consonant, next must be vowel
+              if (!isVowel(prevChar)) {
+                validChar = isVowel(nextChar);
+              } else {
+                // If last char was vowel, any char is valid
+                validChar = true;
+              }
+
+              if (validChar) {
+                chars.push(nextChar);
+              }
+            }
+            charAttempts++;
+          }
+
+          if (!validChar) {
+            validWord = false;
+            break;
+          }
+        }
       }
+
+      if (!validWord) {
+        attempts++;
+        continue;
+      }
+
+      const word = chars.join('');
+
       // simple heuristic: ensure at least 2 distinct chars if length > 2
       if (len > 2) {
-        const distinct = new Set(w.split(''));
+        const distinct = new Set(chars);
         if (distinct.size < 2) {
           attempts++;
           continue;
         }
       }
-      wordsSet.add(w);
+
+      // Double-check no consecutive consonants
+      if (!hasConsecutiveConsonants(word)) {
+        wordsSet.add(word);
+      }
       attempts++;
     }
 
