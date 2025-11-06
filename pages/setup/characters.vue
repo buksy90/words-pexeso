@@ -1,5 +1,6 @@
 <template>
   <v-container class="py-8">
+    <SetupBreadcrumb />
     <h1 class="text-h4 mb-2">Select Characters</h1>
     <p class="text-body-1 mb-6">Toggle the characters that children already know. These will be used to generate words later.</p>
 
@@ -31,12 +32,22 @@
 
     <v-divider class="my-6" />
 
-    <v-btn color="primary" prepend-icon="mdi-arrow-right" :to="'/setup'">Back</v-btn>
+    <div class="d-flex">
+      <v-btn color="primary" prepend-icon="mdi-arrow-left" :to="'/setup'">Back</v-btn>
+      <v-spacer />
+      <v-btn
+        color="secondary"
+        prepend-icon="mdi-arrow-right"
+        :disabled="!active.length"
+        :to="active.length ? '/setup/words' : undefined"
+      >Next</v-btn>
+    </div>
   </v-container>
 </template>
 
 <script setup lang="ts">
 import { useCharacters } from '~/composables/useCharacters';
+import SetupBreadcrumb from '~/components/SetupBreadcrumb.vue';
 import { onMounted, onBeforeUnmount } from 'vue';
 
 const { active, toggle, isActive, clearAll, selectAll } = useCharacters();

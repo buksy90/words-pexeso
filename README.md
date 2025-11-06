@@ -19,7 +19,15 @@ Implemented: **1.1 Character Selection**
 
 Navigate to `Setup` (top bar) then **Select Characters** to open the keyboard grid. Click any character button to toggle inclusion. Selected characters are highlighted and stored globally (persisting while the session stays active) via a Nuxt composable in `composables/useCharacters.ts`.
 
-Next planned steps: 1.2 word length & count selection, generation of candidate words using active characters.
+Implemented: **1.2 Word Generation**
+
+After selecting characters, go to **Generate Words** on the Setup page. Adjust:
+- Min Length / Max Length (range of word sizes)
+- Words Count (how many unique random words to create)
+
+Words are randomly assembled from selected characters using `composables/useWordSetup.ts` ensuring uniqueness and basic diversity (multi-character words must contain at least two distinct letters). Limits: max 50 words, attempts capped to avoid infinite loops.
+
+Next planned steps: 1.3 word confirmation/editing interface.
 
 ## 🚀 Tech Stack
 
