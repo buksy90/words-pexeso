@@ -1,0 +1,273 @@
+<!--
+  Game board page that renders pexeso cards in a grid based on confirmed words.
+  Each word appears twice for matching.
+-->
+<template>
+  <v-container class="py-8">
+    <div v-if="!confirmedWords.length" class="text-center">
+      <v-alert type="warning" variant="tonal" class="mb-6">
+        No words are ready for the game. Please complete the setup first.
+      </v-alert>
+      <v-btn color="primary" :to="'/setup'">Go to Setup</v-btn>
+    </div>
+    <template v-else>
+      <!-- Game Stats -->
+      <v-row class="mb-6">
+        <v-col cols="12" sm="4">
+          <v-card variant="outlined" class="pa-4">
+            <div class="text-subtitle-1">Moves</div>
+            <div class="text-h5">{{ moves }}</div>
+          </v-card>
+        </v-col>
+        <v-col cols="12" sm="4">
+          <v-card variant="outlined" class="pa-4">
+            <div class="text-subtitle-1">Matched Pairs</div>
+            <div class="text-h5">{{ matchedPairs }} / {{ totalPairs }}</div>
+          </v-card>
+        </v-col>
+        <v-col cols="12" sm="4" class="d-flex justify-end align-center">
+          <v-btn
+            color="error"
+            variant="outlined"
+            prepend-icon="mdi-restart"
+            @click="resetGame"
+            :disabled="!gameStarted"
+          >Reset Game</v-btn>
+        </v-col>
+      </v-row>
+
+      <!-- Game Grid -->
+      <v-row class="game-grid" :class="{'game-won': isGameWon}">
+        <v-col
+          v-for="(card, index) in shuffledCards"
+          :key="index"
+          cols="6" sm="4" md="3" lg="2"
+        >
+          <div
+            class="card-flip"
+            :class="{
+              'is-flipped': card.isRevealed,
+              'is-matched': card.isMatched
+            }"
+            @click="flipCard(index)"
+          >
+            <div class="card-inner">
+              <div class="card-front">
+                <v-card
+                  variant="outlined"
+                  class="d-flex align-center justify-center"
+                  height="120"
+                >
+                  <v-icon size="40" color="primary">mdi-help</v-icon>
+                </v-card>
+              </div>
+              <div class="card-back">
+                <v-card
+                  :color="card.isMatched ? 'success' : 'primary'"
+                  class="d-flex align-center justify-center"
+                  height="120"
+                >
+                  <span class="text-h5">{{ card.word }}</span>
+                </v-card>
+              </div>
+            </div>
+          </div>
+        </v-col>
+      </v-row>
+
+      <!-- Win Dialog -->
+      <v-dialog v-model="showWinDialog" persistent max-width="400">
+        <v-card>
+          <v-card-title class="text-h5">Congratulations! 🎉</v-card-title>
+          <v-card-text>
+            <p class="mb-2">You've completed the game!</p>
+            <p class="text-body-2">
+              Moves: {{ moves }}<br>
+              Pairs Matched: {{ matchedPairs }}
+            </p>
+          </v-card-text>
+          <v-card-actions>
+            <v-spacer></v-spacer>
+            <v-btn color="primary" @click="resetGame">Play Again</v-btn>
+            <v-btn color="secondary" :to="'/setup'">Back to Setup</v-btn>
+          </v-card-actions>
+        </v-card>
+      </v-dialog>
+    </template>
+  </v-container>
+</template>
+
+<script setup lang="ts">
+import { ref, computed, watch } from 'vue';
+import { useWordSetup } from '~/composables/useWordSetup';
+
+const { state } = useWordSetup();
+
+interface GameCard {
+  word: string;
+  isRevealed: boolean;
+  isMatched: boolean;
+}
+
+// Game state
+const moves = ref(0);
+const matchedPairs = ref(0);
+const firstCard = ref<number | null>(null);
+const secondCard = ref<number | null>(null);
+const showWinDialog = ref(false);
+const isLocked = ref(false);
+
+// Get confirmed words from setup
+const confirmedWords = computed(() => state.value.confirmedWords);
+const totalPairs = computed(() => confirmedWords.value.length);
+const gameStarted = computed(() => moves.value > 0);
+const isGameWon = computed(() => matchedPairs.value === totalPairs.value);
+
+  // Create and shuffle cards (each word appears twice)
+const shuffledCards = ref<GameCard[]>([]);
+
+// Initialize game
+const initGame = () => {
+  // Create pairs of cards
+  const cards: GameCard[] = [];
+  confirmedWords.value.forEach(word => {
+    // Add each word twice for matching
+    for (let i = 0; i < 2; i++) {
+      cards.push({
+        word,
+        isRevealed: false,
+        isMatched: false
+      });
+    }
+  });
+
+  // Shuffle cards using Fisher-Yates algorithm
+  for (let i = cards.length - 1; i > 0; i--) {
+    const j = Math.floor(Math.random() * (i + 1));
+    const temp = cards[i]!;
+    cards[i] = cards[j]!;
+    cards[j] = temp;
+  }  shuffledCards.value = cards;
+  moves.value = 0;
+  matchedPairs.value = 0;
+  firstCard.value = null;
+  secondCard.value = null;
+  showWinDialog.value = false;
+  isLocked.value = false;
+};
+
+// Reset game
+const resetGame = () => {
+  showWinDialog.value = false;
+  initGame();
+};
+
+// Check if a card can be flipped
+const canFlipCard = (index: number) => {
+  const card = shuffledCards.value[index];
+  if (!card) return false;
+  return !isLocked.value &&
+         !card.isMatched &&
+         !card.isRevealed &&
+         index !== firstCard.value;
+};
+
+// Handle card flip
+const flipCard = (index: number) => {
+  if (!canFlipCard(index)) return;
+
+  const card = shuffledCards.value[index];
+  if (!card) return;
+  card.isRevealed = true;
+
+  if (firstCard.value === null) {
+    // First card flipped
+    firstCard.value = index;
+  } else {
+    // Second card flipped
+    secondCard.value = index;
+    moves.value++;
+
+    // Check for match
+    const card1 = firstCard.value !== null ? shuffledCards.value[firstCard.value] : null;
+    const card2 = card;
+
+    if (card1 && card2 && card1.word === card2.word) {
+      // Match found
+      card1.isMatched = true;
+      card2.isMatched = true;
+      matchedPairs.value++;
+      // Reset for next pair
+      firstCard.value = null;
+      secondCard.value = null;
+    } else {
+      // No match - flip back after delay
+      isLocked.value = true;
+      setTimeout(() => {
+        if (card1) card1.isRevealed = false;
+        if (card2) card2.isRevealed = false;
+        firstCard.value = null;
+        secondCard.value = null;
+        isLocked.value = false;
+      }, 1000);
+    }
+  }
+};
+
+// Watch for game win
+watch(isGameWon, (won) => {
+  if (won) {
+    showWinDialog.value = true;
+  }
+});
+
+// Initialize on mount
+initGame();
+</script>
+
+<style scoped>
+.game-grid {
+  perspective: 1000px;
+}
+
+.card-flip {
+  cursor: pointer;
+  transform-style: preserve-3d;
+  transition: transform 0.5s;
+  height: 120px;
+  position: relative;
+}
+
+.card-flip.is-flipped {
+  transform: rotateY(180deg);
+}
+
+.card-inner {
+  position: relative;
+  width: 100%;
+  height: 100%;
+  transform-style: preserve-3d;
+}
+
+.card-front,
+.card-back {
+  position: absolute;
+  width: 100%;
+  height: 100%;
+  backface-visibility: hidden;
+  -webkit-backface-visibility: hidden;
+}
+
+.card-back {
+  transform: rotateY(180deg);
+}
+
+.game-won .card-flip {
+  animation: celebrate 1s ease-in-out;
+}
+
+@keyframes celebrate {
+  0%, 100% { transform: scale(1); }
+  50% { transform: scale(1.1); }
+}
+</style>

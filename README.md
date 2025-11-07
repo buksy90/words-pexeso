@@ -15,6 +15,17 @@ The game aims at helping children learn read first characters and join them in s
 
 ## Current Implementation
 
+Implemented: **2.1 Game Board**
+
+The main game is now playable by clicking "Play Game" in the top bar. Features:
+- Displays shuffled cards in a responsive grid
+- Each word from setup appears twice for matching
+- Cards flip with animation on click
+- Tracks moves and matched pairs
+- Prevents invalid moves (clicking revealed/matched cards)
+- Shows win dialog with stats when complete
+- Option to reset game or return to setup
+
 Implemented: **1.1 Character Selection**
 
 Navigate to `Setup` (top bar) then **Select Characters** to open the keyboard grid. Click any character button to toggle inclusion. Selected characters are highlighted and stored globally (persisting while the session stays active) via a Nuxt composable in `composables/useCharacters.ts`.

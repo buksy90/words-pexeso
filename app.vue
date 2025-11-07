@@ -4,10 +4,8 @@
       <v-app-bar-nav-icon></v-app-bar-nav-icon>
       <v-toolbar-title>Pexeso Game</v-toolbar-title>
       <v-spacer></v-spacer>
+      <v-btn to="/game" variant="text" prepend-icon="mdi-cards">Play Game</v-btn>
       <v-btn to="/setup" variant="text" prepend-icon="mdi-cog">Setup</v-btn>
-      <v-btn icon>
-        <v-icon>mdi-heart</v-icon>
-      </v-btn>
     </v-app-bar>
 
     <v-main>
