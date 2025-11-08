@@ -49,7 +49,11 @@
       </v-row>
 
       <!-- Game Grid -->
-      <v-row class="game-grid" :class="{'game-won': isGameWon}">
+      <v-row
+        class="game-grid"
+        :class="{'game-won': isGameWon, 'waiting-for-click': waitingForClick}"
+        @click="handleBoardClick"
+      >
         <v-col
           v-for="(card, index) in shuffledCards"
           :key="index"
@@ -61,7 +65,7 @@
               'is-flipped': card.isRevealed,
               'is-matched': card.isMatched
             }"
-            @click="flipCard(index)"
+            @click.stop="flipCard(index)"
           >
             <div class="card-inner">
               <div class="card-front">
@@ -139,6 +143,7 @@ const firstCard = ref<number | null>(null);
 const secondCard = ref<number | null>(null);
 const showWinDialog = ref(false);
 const isLocked = ref(false);
+const waitingForClick = ref(false);
 
 // Speech synthesis state
 const availableVoices = ref<VoiceOption[]>([]);
@@ -246,12 +251,30 @@ const initGame = () => {
   secondCard.value = null;
   showWinDialog.value = false;
   isLocked.value = false;
+  waitingForClick.value = false;
 };
 
 // Reset game
 const resetGame = () => {
   showWinDialog.value = false;
   initGame();
+};
+
+// Handle board click to flip cards back
+const handleBoardClick = () => {
+  if (waitingForClick.value) {
+    // Flip back the non-matching cards
+    const card1 = firstCard.value !== null ? shuffledCards.value[firstCard.value] : null;
+    const card2 = secondCard.value !== null ? shuffledCards.value[secondCard.value] : null;
+
+    if (card1) card1.isRevealed = false;
+    if (card2) card2.isRevealed = false;
+
+    firstCard.value = null;
+    secondCard.value = null;
+    waitingForClick.value = false;
+    isLocked.value = false;
+  }
 };
 
 // Check if a card can be flipped
@@ -296,15 +319,9 @@ const flipCard = (index: number) => {
       firstCard.value = null;
       secondCard.value = null;
     } else {
-      // No match - flip back after delay
+      // No match - wait for player to click anywhere to continue
       isLocked.value = true;
-      setTimeout(() => {
-        if (card1) card1.isRevealed = false;
-        if (card2) card2.isRevealed = false;
-        firstCard.value = null;
-        secondCard.value = null;
-        isLocked.value = false;
-      }, 1000);
+      waitingForClick.value = true;
     }
   }
 };
@@ -381,5 +398,29 @@ initGame();
 .card-word {
   font-weight: bold;
   letter-spacing: 0.05em;
+}
+
+.waiting-for-click {
+  cursor: pointer;
+}
+
+.waiting-for-click::after {
+  content: 'Click anywhere to continue...';
+  position: fixed;
+  bottom: 20px;
+  left: 50%;
+  transform: translateX(-50%);
+  background: rgba(0, 0, 0, 0.8);
+  color: white;
+  padding: 12px 24px;
+  border-radius: 8px;
+  font-size: 1.1rem;
+  z-index: 1000;
+  animation: pulse 1.5s infinite;
+}
+
+@keyframes pulse {
+  0%, 100% { opacity: 1; }
+  50% { opacity: 0.6; }
 }
 </style>

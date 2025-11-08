@@ -18,9 +18,13 @@ The game aims at helping children learn read first characters and join them in s
 
 ## Current Implementation
 
+Implemented: **3.2 Click-to-Continue Card Flipping**
+
+When two non-matching cards are revealed, they now stay visible until the player clicks anywhere on the game board. This gives young players more time to read and compare both words. A helpful "Click anywhere to continue..." message appears at the bottom of the screen to guide the player. This replaces the previous auto-flip timeout behavior.
+
 Implemented: **3.1 Font Selection**
 
-Navigate to `Setup` then **Select Font** to choose from 8 different font styles optimized for readability. Options include playful fonts like Comic Sans, clear fonts like Verdana, and classic fonts like Times New Roman. The selected font persists in localStorage and is applied to all game cards for consistent, easy-to-read text.
+Navigate to `Setup` then **Select Font** to choose from 9 different font styles optimized for readability. Options include handwritten fonts like Ms Madi, playful fonts like Comic Sans, clear fonts like Verdana, and classic fonts like Times New Roman. The selected font persists in localStorage and is applied to all game cards for consistent, easy-to-read text.
 
 Implemented: **2.1 Game Board**
 
