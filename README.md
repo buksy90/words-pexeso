@@ -4,6 +4,10 @@ A Nuxt 3 application with TypeScript and Vuetify built for creating a Pexeso (Me
 
 The game aims at helping children learn read first characters and join them in single words.
 
+## Educational Benefits
+
+The game helps children develop **letter order awareness**. During gameplay, children naturally pay closer attention to the sequence of letters in words, helping them distinguish between similar combinations (e.g., "lo" vs "ol") that they might otherwise confuse when reading casually.
+
 ## Roadmap
 1. Game setup, let player define list of characters that children already know and can be used within game. There should be some "Setup" page with following subpages:
  - 1.1. Displays characters on keyboard where player can toggle which characters he wants to activate.
@@ -15,8 +19,16 @@ The game aims at helping children learn read first characters and join them in s
 3. Game experience improvements
  - 3.1 Allow player to choose font style for better readability
  - 3.2 Change card flip-back behavior: when two non-matching cards are selected, keep them visible until player clicks anywhere on the game board (instead of auto-flipping after timeout). This gives young players more time to read both words.
+ - 3.3 Let player choose the font size while playing
+ - 3.4 Extract game logic into separate composable and update the application to only render the state
+ - 3.5 Add unit tests to game logic
+ - 3.6 Add leaderscore (saved into local storage)
 
 ## Current Implementation
+
+Implemented: **3.3 Dynamic Font Size Control**
+
+Players can now adjust the font size while playing the game using a dropdown selector in the game stats area. Choose from five sizes: Small (16px), Medium (20px), Large (24px), Extra Large (32px), and Huge (40px). The font size changes are applied immediately to all cards and persist in localStorage. This helps accommodate different screen sizes and reading preferences.
 
 Implemented: **3.2 Click-to-Continue Card Flipping**
 

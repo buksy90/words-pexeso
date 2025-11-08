@@ -25,7 +25,7 @@
             <div class="text-h5">{{ matchedPairs }} / {{ totalPairs }}</div>
           </v-card>
         </v-col>
-        <v-col cols="12" sm="3">
+        <v-col cols="12" sm="2">
           <v-select
             v-model="selectedVoice"
             :items="availableVoices"
@@ -37,7 +37,19 @@
             hide-details
           ></v-select>
         </v-col>
-        <v-col cols="12" sm="3" class="d-flex justify-end align-center">
+        <v-col cols="12" sm="2">
+          <v-select
+            v-model="settings.fontSize"
+            :items="FONT_SIZE_OPTIONS"
+            item-title="name"
+            item-value="value"
+            label="Font Size"
+            variant="outlined"
+            density="compact"
+            hide-details
+          ></v-select>
+        </v-col>
+        <v-col cols="12" sm="2" class="d-flex justify-end align-center">
           <v-btn
             color="error"
             variant="outlined"
@@ -84,8 +96,11 @@
                   height="120"
                 >
                   <span
-                    class="text-h5 card-word"
-                    :style="{ fontFamily: settings.fontFamily }"
+                    class="card-word"
+                    :style="{
+                      fontFamily: settings.fontFamily,
+                      fontSize: `${settings.fontSize}px`
+                    }"
                   >{{ card.word }}</span>
                 </v-card>
               </div>
@@ -119,7 +134,7 @@
 <script setup lang="ts">
 import { ref, computed, watch, onMounted } from 'vue';
 import { useWordSetup } from '~/composables/useWordSetup';
-import { useGameSettings } from '~/composables/useGameSettings';
+import { useGameSettings, FONT_SIZE_OPTIONS } from '~/composables/useGameSettings';
 
 const { state } = useWordSetup();
 const { settings } = useGameSettings();

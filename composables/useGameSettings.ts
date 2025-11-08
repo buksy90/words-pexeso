@@ -3,12 +3,18 @@ import { onMounted, watch } from 'vue';
 
 export interface GameSettings {
   fontFamily: string;
+  fontSize: number;
 }
 
 export interface FontOption {
   name: string;
   value: string;
   preview: string;
+}
+
+export interface FontSizeOption {
+  name: string;
+  value: number;
 }
 
 // Available font options
@@ -60,12 +66,22 @@ export const FONT_OPTIONS: FontOption[] = [
   }
 ];
 
+// Available font size options
+export const FONT_SIZE_OPTIONS: FontSizeOption[] = [
+  { name: 'Small', value: 16 },
+  { name: 'Medium', value: 20 },
+  { name: 'Large', value: 24 },
+  { name: 'Extra Large', value: 32 },
+  { name: 'Huge', value: 40 }
+];
+
 export function useGameSettings() {
   const STORAGE_KEY = 'pexeso_game_settings';
 
   // Persistent state
   const settings: Ref<GameSettings> = useState<GameSettings>('gameSettings', () => ({
-    fontFamily: FONT_OPTIONS[0]!.value
+    fontFamily: FONT_OPTIONS[0]!.value,
+    fontSize: 20 // Default to Medium
   }));
 
   // Load from localStorage on mount
@@ -77,6 +93,7 @@ export function useGameSettings() {
           const parsed = JSON.parse(raw);
           if (parsed && typeof parsed === 'object') {
             if (parsed.fontFamily) settings.value.fontFamily = parsed.fontFamily;
+            if (typeof parsed.fontSize === 'number') settings.value.fontSize = parsed.fontSize;
           }
         }
       } catch (e) {
@@ -96,5 +113,5 @@ export function useGameSettings() {
     }
   }, { deep: true });
 
-  return { settings, FONT_OPTIONS };
+  return { settings, FONT_OPTIONS, FONT_SIZE_OPTIONS };
 }
