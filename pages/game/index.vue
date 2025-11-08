@@ -79,7 +79,10 @@
                   class="d-flex align-center justify-center"
                   height="120"
                 >
-                  <span class="text-h5">{{ card.word }}</span>
+                  <span
+                    class="text-h5 card-word"
+                    :style="{ fontFamily: settings.fontFamily }"
+                  >{{ card.word }}</span>
                 </v-card>
               </div>
             </div>
@@ -112,8 +115,10 @@
 <script setup lang="ts">
 import { ref, computed, watch, onMounted } from 'vue';
 import { useWordSetup } from '~/composables/useWordSetup';
+import { useGameSettings } from '~/composables/useGameSettings';
 
 const { state } = useWordSetup();
+const { settings } = useGameSettings();
 
 interface GameCard {
   word: string;
@@ -151,7 +156,7 @@ const shuffledCards = ref<GameCard[]>([]);
 
 // Load available voices
 const loadVoices = () => {
-  if (!process.client || typeof window === 'undefined' || !window.speechSynthesis) return;
+  if (typeof window === 'undefined' || !window.speechSynthesis) return;
 
   const synth = window.speechSynthesis;
   speechSynthesis.value = synth;
@@ -185,14 +190,14 @@ const loadVoices = () => {
 
 // Save voice preference
 watch(selectedVoice, (newVoice) => {
-  if (process.client && typeof window !== 'undefined' && newVoice) {
+  if (typeof window !== 'undefined' && newVoice) {
     localStorage.setItem('pexeso_voice', newVoice);
   }
 });
 
 // Speak a word
 const speakWord = (word: string) => {
-  if (!process.client || typeof window === 'undefined' || !speechSynthesis.value || !word) return;
+  if (typeof window === 'undefined' || !speechSynthesis.value || !word) return;
 
   // Cancel any ongoing speech
   speechSynthesis.value.cancel();
@@ -313,7 +318,7 @@ watch(isGameWon, (won) => {
 
 // Initialize voices and game on mount
 onMounted(() => {
-  if (process.client && typeof window !== 'undefined' && window.speechSynthesis) {
+  if (typeof window !== 'undefined' && window.speechSynthesis) {
     loadVoices();
 
     // Voices may load asynchronously
@@ -371,5 +376,10 @@ initGame();
 @keyframes celebrate {
   0%, 100% { transform: scale(1); }
   50% { transform: scale(1.1); }
+}
+
+.card-word {
+  font-weight: bold;
+  letter-spacing: 0.05em;
 }
 </style>

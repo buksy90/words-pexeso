@@ -12,8 +12,15 @@ The game aims at helping children learn read first characters and join them in s
 2. Let Player run the game
  - 2.1 Render pexeso based on the words selected in setup.
  - 2.2 Read words on pexeso chard when it is chosen.
+3. Game experience improvements
+ - 3.1 Allow player to choose font style for better readability
+ - 3.2 Change card flip-back behavior: when two non-matching cards are selected, keep them visible until player clicks anywhere on the game board (instead of auto-flipping after timeout). This gives young players more time to read both words.
 
 ## Current Implementation
+
+Implemented: **3.1 Font Selection**
+
+Navigate to `Setup` then **Select Font** to choose from 8 different font styles optimized for readability. Options include playful fonts like Comic Sans, clear fonts like Verdana, and classic fonts like Times New Roman. The selected font persists in localStorage and is applied to all game cards for consistent, easy-to-read text.
 
 Implemented: **2.1 Game Board**
 

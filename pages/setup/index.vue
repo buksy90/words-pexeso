@@ -6,13 +6,14 @@
       <p class="mb-6">Configure game inputs before starting. Follow steps below.</p>
       <v-row>
         <v-col cols="12" md="6" class="d-flex flex-column">
-          <v-btn color="primary" prepend-icon="mdi-alphabetical" :to="'/setup/characters'" class="mb-3">1. Select Characters</v-btn>
+          <v-btn color="primary" prepend-icon="mdi-format-font" :to="'/setup/font'" class="mb-3">1. Select Font</v-btn>
+          <v-btn color="primary" prepend-icon="mdi-alphabetical" :to="'/setup/characters'" class="mb-3">2. Select Characters</v-btn>
           <v-btn
             color="secondary"
             prepend-icon="mdi-form-select"
             :to="'/setup/words'"
             :disabled="!active.length"
-          >2. Generate Words</v-btn>
+          >3. Generate Words</v-btn>
           <small class="text-grey mt-2" v-if="!active.length">Select at least one character to proceed to word generation.</small>
         </v-col>
       </v-row>
