@@ -23,7 +23,7 @@ The game helps children develop **letter order awareness**. During gameplay, chi
  - 3.4 Extract game logic into separate composable and update the application to only render the state
  - 3.5 Add unit tests to game logic
  - 3.6 Add leaderscore (saved into local storage)
- - 3.7 Report repeating words
+ - 3.7 Report repeating words on confirm page when same word is entered multiple times. Add some error state to input
 
 ## Current Implementation
 
@@ -80,6 +80,14 @@ Persistence:
 - Selected characters persist in `localStorage` under key `pexeso_active_chars`.
 - Generated and confirmed words persist under key `pexeso_words_state_v1` (structure: `{ words: string[], confirmedWords: string[] }`).
 - You can reload the app or navigate directly to `/setup/confirm` and the previously generated words and confirmed selection will be restored.
+
+Implemented: **3.7 Report Repeating Words on Confirm Page**
+
+When the same word appears multiple times in the Confirm step, the UI now flags each occurrence with a "Duplicate" warning. The confirm page shows where duplicates appear (positions) to help the player edit or remove repeats before confirming. Duplicate detection is performed case-insensitively on the current word list.
+
+Persistence (duplicates):
+
+- Duplicate information is computed from the saved `words` array and persisted alongside the words under `pexeso_words_state_v1` so duplicate state is preserved across reloads.
 
 After confirmation, the list is locked (until further edits) and ready for game board generation in phase 2.
 

@@ -10,6 +10,7 @@ export interface WordSetupState {
   confirmedWords: string[];
   dirty: boolean;
   generating: boolean;
+  duplicates: Record<string, number[]>;
 }
 
 export function useWordSetup() {
@@ -21,7 +22,8 @@ export function useWordSetup() {
     words: [],
     confirmedWords: [],
     dirty: false,
-    generating: false
+    generating: false,
+    duplicates: {} as Record<string, number[]>
   }));
 
   const { active } = useCharacters();
@@ -36,18 +38,24 @@ export function useWordSetup() {
         if (parsed && typeof parsed === 'object') {
           if (Array.isArray(parsed.words)) state.value.words = parsed.words.filter((w: any) => typeof w === 'string');
           if (Array.isArray(parsed.confirmedWords)) state.value.confirmedWords = parsed.confirmedWords.filter((w: any) => typeof w === 'string');
+          // Always ensure duplicates is initialized
+          state.value.duplicates = {};
+          // Update duplicates based on loaded words
+          checkDuplicates();
         }
       }
     } catch (e) {
       // ignore malformed data
+      state.value.duplicates = {};
     }
   });
 
-  watch(() => [state.value.words, state.value.confirmedWords], () => {
+  watch(() => [state.value.words, state.value.confirmedWords, state.value.duplicates], () => {
     try {
       localStorage.setItem(STORAGE_KEY, JSON.stringify({
         words: state.value.words,
         confirmedWords: state.value.confirmedWords,
+        duplicates: state.value.duplicates
       }));
     } catch (e) {
       // quota errors ignored
@@ -154,12 +162,34 @@ export function useWordSetup() {
     state.value.words = Array.from(wordsSet);
     state.value.dirty = true;
     state.value.generating = false;
+    checkDuplicates();
   };
 
   const clearWords = () => {
     state.value.words = [];
     state.value.confirmedWords = [];
+    state.value.duplicates = {};
     state.value.dirty = false;
+  };
+
+  const checkDuplicates = () => {
+    const wordMap = new Map<string, number[]>();
+    state.value.words.forEach((word, index) => {
+      const w = word.toLowerCase();
+      if (!wordMap.has(w)) {
+        wordMap.set(w, [index]);
+      } else {
+        wordMap.get(w)?.push(index);
+      }
+    });
+
+    const duplicates: Record<string, number[]> = {};
+    for (const [word, indices] of wordMap.entries()) {
+      if (indices.length > 1) {
+        duplicates[word] = indices;
+      }
+    }
+    state.value.duplicates = duplicates;
   };
 
   const validateWord = (w: string): boolean => {
@@ -181,12 +211,14 @@ export function useWordSetup() {
     if (index < 0 || index >= state.value.words.length) return;
     state.value.words[index] = newWord.trim();
     state.value.dirty = true;
+    checkDuplicates();
   };
 
   const removeWord = (index: number) => {
     if (index < 0 || index >= state.value.words.length) return;
     state.value.words.splice(index, 1);
     state.value.dirty = true;
+    checkDuplicates();
   };
 
   const addWord = (w: string) => {
@@ -194,6 +226,7 @@ export function useWordSetup() {
     if (!word) return;
     state.value.words.push(word);
     state.value.dirty = true;
+    checkDuplicates();
   };
 
   const confirmWords = () => {
@@ -204,7 +237,33 @@ export function useWordSetup() {
 
   const hasInvalid = () => state.value.words.some(w => !validateWord(w));
 
-  return { state, generateWords, clearWords, validateWord, updateWord, removeWord, addWord, confirmWords, hasInvalid };
+  const hasDuplicateError = (index: number): boolean => {
+    const word = state.value.words[index]?.toLowerCase();
+    if (!word) return false;
+    return Object.entries(state.value.duplicates).some(([key, indices]) =>
+      key === word && indices.includes(index)
+    );
+  };
+
+  const getDuplicateIndices = (index: number): number[] => {
+    const word = state.value.words[index]?.toLowerCase();
+    if (!word) return [];
+    return state.value.duplicates[word] || [];
+  };
+
+  return {
+    state,
+    generateWords,
+    clearWords,
+    validateWord,
+    updateWord,
+    removeWord,
+    addWord,
+    confirmWords,
+    hasInvalid,
+    hasDuplicateError,
+    getDuplicateIndices
+  };
 }
 
 function randInt(min: number, max: number) {

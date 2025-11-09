@@ -50,12 +50,20 @@
                   />
                 </td>
                 <td>
-                  <v-chip :color="validateWord(editable[i]) ? 'success' : 'error'" size="x-small" variant="flat">
-                    {{ validateWord(editable[i]) ? 'Valid' : 'Invalid' }}
-                  </v-chip>
+                  <div class="d-flex gap-1">
+                    <v-chip :color="validateWord(editable[i] || '') ? 'success' : 'error'" size="x-small" variant="flat">
+                      {{ validateWord(editable[i] || '') ? 'Valid' : 'Invalid' }}
+                    </v-chip>
+                    <v-chip v-if="hasDuplicateError(i)" color="warning" size="x-small" variant="flat" class="ml-1">
+                      Duplicate
+                      <v-tooltip activator="parent">
+                        <span>Also appears at position(s): {{ getDuplicateIndices(i).filter((idx: number) => idx !== i).map((idx: number) => idx + 1).join(', ') }}</span>
+                      </v-tooltip>
+                    </v-chip>
+                  </div>
                 </td>
                 <td>
-                  <v-btn icon size="x-small" variant="text" @click="saveSingle(i)" :disabled="!validateWord(editable[i])">
+                  <v-btn icon size="x-small" variant="text" @click="saveSingle(i)" :disabled="!validateWord(editable[i] || '')">
                     <v-icon size="18">mdi-content-save</v-icon>
                   </v-btn>
                   <v-btn icon size="x-small" variant="text" @click="removeWord(i)">
@@ -106,7 +114,7 @@ import { useWordSetup } from '~/composables/useWordSetup';
 import SetupBreadcrumb from '~/components/SetupBreadcrumb.vue';
 
 const { active } = useCharacters();
-const { state, validateWord, updateWord, removeWord, addWord, confirmWords, hasInvalid } = useWordSetup();
+const { state, validateWord, updateWord, removeWord, addWord, confirmWords, hasInvalid, hasDuplicateError, getDuplicateIndices } = useWordSetup();
 
 // local editable buffer
 // IMPORTANT: state is a ref, must use state.value when accessing inside script
@@ -127,7 +135,7 @@ const markDirty = (i: number) => {
 };
 
 const saveSingle = (i: number) => {
-  const w = editable[i];
+  const w = editable[i] || '';
   if (validateWord(w)) {
     updateWord(i, w);
   }
@@ -142,9 +150,9 @@ const addNew = () => {
 const confirmAll = () => {
   // push any unsaved edits first
   editable.forEach((w, i) => {
-    const val = w ?? '';
-  // always push current editable value to state so confirmation reflects user's edits
-  updateWord(i, val);
+    const val = w || '';
+    // always push current editable value to state so confirmation reflects user's edits
+    updateWord(i, val);
   });
   confirmWords();
 };
