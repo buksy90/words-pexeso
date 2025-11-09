@@ -23,6 +23,7 @@ The game helps children develop **letter order awareness**. During gameplay, chi
  - 3.4 Extract game logic into separate composable and update the application to only render the state
  - 3.5 Add unit tests to game logic
  - 3.6 Add leaderscore (saved into local storage)
+ - 3.7 Report repeating words
 
 ## Current Implementation
 
@@ -68,6 +69,11 @@ Use the **Confirm** step to review generated words:
 - Remove unwanted words.
 - Add new custom words manually (must pass same validation rules).
 - Confirm the list (stored in `state.confirmedWords` via `useWordSetup`).
+
+Note on confirmation behavior
+
+- The app now allows confirming words even when some entries are invalid. When you click "Confirm Words" the current list (including any invalid entries) is saved into `state.confirmedWords` and persisted to localStorage under `pexeso_words_state_v1`.
+- The UI still highlights invalid words and shows a warning, but the Confirm button is enabled as long as there is at least one word. Any inline edits are written back to the underlying state before confirmation so the confirmed list reflects the user's latest edits.
 
 Persistence:
 

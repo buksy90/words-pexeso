@@ -87,7 +87,7 @@
             class="ml-2"
             prepend-icon="mdi-check"
             @click="confirmAll"
-            :disabled="hasInvalid() || !state.words.length"
+            :disabled="!state.words.length"
           >Confirm Words</v-btn>
         </v-col>
       </v-row>
@@ -143,7 +143,8 @@ const confirmAll = () => {
   // push any unsaved edits first
   editable.forEach((w, i) => {
     const val = w ?? '';
-    if (validateWord(val)) updateWord(i, val);
+  // always push current editable value to state so confirmation reflects user's edits
+  updateWord(i, val);
   });
   confirmWords();
 };

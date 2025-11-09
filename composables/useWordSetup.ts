@@ -197,9 +197,9 @@ export function useWordSetup() {
   };
 
   const confirmWords = () => {
-    // filter only valid words
-    state.value.confirmedWords = state.value.words.filter(validateWord);
-    state.value.dirty = false;
+  // confirm all words (allow invalid words to be saved as confirmed)
+  state.value.confirmedWords = state.value.words.slice();
+  state.value.dirty = false;
   };
 
   const hasInvalid = () => state.value.words.some(w => !validateWord(w));
