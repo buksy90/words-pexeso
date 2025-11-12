@@ -34,7 +34,7 @@ describe('useGame composable', () => {
     expect(indicesAA.length).toBe(2);
 
     // Flip first 'aa'
-    game.flipCard(indicesAA[0]);
+    game.flipCard(indicesAA[0]!);
     expect(game.shuffledCards.value[indicesAA[0]].isRevealed).toBe(true);
 
     // Flip second 'aa' to create match

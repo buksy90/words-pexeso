@@ -71,41 +71,7 @@
           :key="index"
           cols="6" sm="4" md="3" lg="2"
         >
-          <div
-            class="card-flip"
-            :class="{
-              'is-flipped': card.isRevealed,
-              'is-matched': card.isMatched
-            }"
-            @click.stop="flipCard(index)"
-          >
-            <div class="card-inner">
-              <div class="card-front">
-                <v-card
-                  variant="outlined"
-                  class="d-flex align-center justify-center"
-                  height="120"
-                >
-                  <v-icon size="40" color="primary">mdi-help</v-icon>
-                </v-card>
-              </div>
-              <div class="card-back">
-                <v-card
-                  :color="card.isMatched ? 'success' : 'primary'"
-                  class="d-flex align-center justify-center"
-                  height="120"
-                >
-                  <span
-                    class="card-word"
-                    :style="{
-                      fontFamily: settings.fontFamily,
-                      fontSize: `${settings.fontSize}px`
-                    }"
-                  >{{ card.word }}</span>
-                </v-card>
-              </div>
-            </div>
-          </div>
+          <PexesoCard :card="card" :index="index" :settings="settings" @flip="flipCard" />
         </v-col>
       </v-row>
 
@@ -134,10 +100,11 @@
 <script setup lang="ts">
 import { useGame } from '~/composables/useGame';
 import { useGameSettings, FONT_SIZE_OPTIONS } from '~/composables/useGameSettings';
+import PexesoCard from '~/components/PexesoCard.vue';
+import { useWordSetup } from '~/composables/useWordSetup';
 
 const { settings } = useGameSettings();
 const { state } = useWordSetup();
-
 
 const {
   moves,
@@ -161,52 +128,6 @@ const {
 <style scoped>
 .game-grid {
   perspective: 1000px;
-}
-
-.card-flip {
-  cursor: pointer;
-  transform-style: preserve-3d;
-  transition: transform 0.5s;
-  height: 120px;
-  position: relative;
-}
-
-.card-flip.is-flipped {
-  transform: rotateY(180deg);
-}
-
-.card-inner {
-  position: relative;
-  width: 100%;
-  height: 100%;
-  transform-style: preserve-3d;
-}
-
-.card-front,
-.card-back {
-  position: absolute;
-  width: 100%;
-  height: 100%;
-  backface-visibility: hidden;
-  -webkit-backface-visibility: hidden;
-}
-
-.card-back {
-  transform: rotateY(180deg);
-}
-
-.game-won .card-flip {
-  animation: celebrate 1s ease-in-out;
-}
-
-@keyframes celebrate {
-  0%, 100% { transform: scale(1); }
-  50% { transform: scale(1.1); }
-}
-
-.card-word {
-  font-weight: bold;
-  letter-spacing: 0.05em;
 }
 
 .waiting-for-click {
