@@ -39,7 +39,7 @@
         </v-col>
         <v-col cols="12" sm="2">
           <v-select
-            v-model="gameSettings.settings.value.fontSize"
+            v-model="gameSettings.fontSize"
             :items="FONT_SIZE_OPTIONS"
             item-title="name"
             item-value="value"
@@ -99,7 +99,8 @@
 
 <script setup lang="ts">
 import { useGame } from '~/composables/useGame';
-import { useGameSettings, FONT_SIZE_OPTIONS } from '~/composables/useGameSettings';
+import { useGameSettings } from '~/composables/useGameSettings';
+import { FONT_SIZE_OPTIONS } from '~/composables/constants';
 import PexesoCard from '~/components/PexesoCard.vue';
 import { useWordSetup } from '~/composables/useWordSetup';
 
