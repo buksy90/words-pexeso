@@ -1,4 +1,13 @@
-import type { FontSizeOption } from './useGameSettings';
+export interface FontOption {
+  name: string;
+  value: string;
+  preview: string;
+}
+
+export interface FontSizeOption {
+  name: string;
+  value: number;
+}
 
 export const FONT_SIZE_OPTIONS: FontSizeOption[] = [
   { name: 'Small', value: 16 },
