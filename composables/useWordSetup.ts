@@ -1,6 +1,7 @@
 import type { Ref } from 'vue';
 import { onMounted, watch } from 'vue';
 import { useCharacters } from './useCharacters';
+import { useLocalStorage } from './useLocalStorage';
 //import { useState} from 'nuxt/config';
 
 export interface WordSetupState {
@@ -31,37 +32,38 @@ export function useWordSetup() {
 
   const STORAGE_KEY = 'pexeso_words_state_v1';
 
-  onMounted(() => {
-    try {
-      const raw = localStorage.getItem(STORAGE_KEY);
-      if (raw) {
-        const parsed = JSON.parse(raw);
+  const storage = useLocalStorage<{ words?: string[]; confirmedWords?: string[]; duplicates?: Record<string, number[]> }>(STORAGE_KEY);
+
+  if (typeof window !== 'undefined') {
+    onMounted(() => {
+      try {
+        const parsed = storage.load();
         if (parsed && typeof parsed === 'object') {
           if (Array.isArray(parsed.words)) state.value.words = parsed.words.filter((w: any) => typeof w === 'string');
           if (Array.isArray(parsed.confirmedWords)) state.value.confirmedWords = parsed.confirmedWords.filter((w: any) => typeof w === 'string');
           // Always ensure duplicates is initialized
-          state.value.duplicates = {};
+          state.value.duplicates = parsed.duplicates || {};
           // Update duplicates based on loaded words
           checkDuplicates();
         }
+      } catch (e) {
+        // ignore malformed data
+        state.value.duplicates = {};
       }
-    } catch (e) {
-      // ignore malformed data
-      state.value.duplicates = {};
-    }
-  });
+    });
 
-  watch(() => [state.value.words, state.value.confirmedWords, state.value.duplicates], () => {
-    try {
-      localStorage.setItem(STORAGE_KEY, JSON.stringify({
-        words: state.value.words,
-        confirmedWords: state.value.confirmedWords,
-        duplicates: state.value.duplicates
-      }));
-    } catch (e) {
-      // quota errors ignored
-    }
-  }, { deep: true });
+    watch(() => [state.value.words, state.value.confirmedWords, state.value.duplicates], () => {
+      try {
+        storage.save({
+          words: state.value.words,
+          confirmedWords: state.value.confirmedWords,
+          duplicates: state.value.duplicates
+        });
+      } catch (e) {
+        // quota errors ignored
+      }
+    }, { deep: true });
+  }
 
   const isVowel = (char: string): boolean => {
     return ['a', 'e', 'i', 'o', 'u', 'y'].includes(char.toLowerCase());
