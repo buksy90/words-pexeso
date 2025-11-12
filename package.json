@@ -21,6 +21,7 @@
   },
   "devDependencies": {
     "@vue/test-utils": "^2.0.0-rc.18",
+  "@vitejs/plugin-vue": "^6.0.1",
     "jsdom": "^27.0.1",
     "vitest": "^1.0.0"
   }

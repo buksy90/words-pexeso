@@ -31,14 +31,18 @@
 </template>
 
 <script setup lang="ts">
-import { defineProps, defineEmits, computed } from 'vue';
+import { defineProps, defineEmits, toRef } from 'vue';
 
 const props = defineProps<{
   card: { word: string; isRevealed: boolean; isMatched: boolean },
   index: number,
   settings: GameSettings,
 }>();
-const { card, index, settings } = props;
+
+// Keep props reactive by using toRef instead of destructuring
+const card = toRef(props, 'card');
+const index = toRef(props, 'index');
+const settings = toRef(props, 'settings');
 const emit = defineEmits<{ (e: 'flip', index: number): void }>();
 </script>
 
