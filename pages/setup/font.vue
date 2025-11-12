@@ -70,8 +70,10 @@
 <script setup lang="ts">
 import { useGameSettings } from '~/composables/useGameSettings';
 import SetupBreadcrumb from '~/components/SetupBreadcrumb.vue';
+import { FONT_OPTIONS } from '~/composables/constants';
 
-const { settings, FONT_OPTIONS } = useGameSettings();
+const settings = useGameSettings();
+
 
 const selectFont = (fontValue: string) => {
   settings.value.fontFamily = fontValue;

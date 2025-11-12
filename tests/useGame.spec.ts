@@ -1,7 +1,7 @@
 import { describe, it, expect } from 'vitest';
 import { ref } from 'vue';
 
-import { useGame } from '../composables/useGame';
+import { usePexesoGame } from '../composables/usePexesoGame';
 
 describe('useGame composable', () => {
   it('initializes cards for confirmed words and allows flips and matches', () => {
@@ -17,7 +17,7 @@ describe('useGame composable', () => {
       duplicates: {}
     });
 
-    const game = useGame(sharedWordState);
+  const game = usePexesoGame(sharedWordState);
 
     // Explicitly initialize (composable initializes on construction but keep this)
     game.initGame?.();

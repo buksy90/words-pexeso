@@ -38,10 +38,10 @@ Players can now adjust the font size while playing the game using a dropdown sel
 
 Implemented: **3.4 Extract game logic into separate composable**
 
-The core game logic (shuffle, flip handling, match detection, move counting, speech synthesis control and related state) has been moved out of `pages/game/index.vue` into a dedicated composable: `composables/useGame.ts`.
+The core game logic (shuffle, flip handling, match detection, move counting, speech synthesis control and related state) has been moved out of `pages/game/index.vue` into a dedicated composable: `composables/usePexesoGame.ts`.
 
 What changed:
-- `composables/useGame.ts` — new composable containing game state and actions (initGame, resetGame, flipCard, handleBoardClick, speakWord, voice loading).
+- `composables/usePexesoGame.ts` — new composable containing game state and actions (initGame, resetGame, flipCard, handleBoardClick, speakWord, voice loading).
 - `pages/game/index.vue` — now imports and consumes the composable and focuses on rendering UI and bindings only.
 
 Benefits:
@@ -53,14 +53,14 @@ Validation: the project builds successfully after the change (client & server bu
 
 Implemented: **3.5 Unit tests for game logic**
 
-Unit tests were added to cover the extracted game logic in `composables/useGame.ts`.
+Unit tests were added to cover the extracted game logic in `composables/usePexesoGame.ts`.
 
 What changed / files added:
 - `vitest.config.ts` — Vitest configuration (jsdom environment).
 - `tests/useGame.spec.ts` — Unit test covering card creation, flip and match behavior.
 - `package.json` — `test` script (`vitest`) and devDependencies added for running tests.
 - Dev dependencies installed: `vitest`, `@vue/test-utils`, `jsdom`.
-- Minor composable change: `useGame` now accepts the game state (word setup state) as an argument to improve testability.
+- Minor composable change: `usePexesoGame` now accepts the game state (word setup state) as an argument to improve testability.
 
 How to run tests locally:
 

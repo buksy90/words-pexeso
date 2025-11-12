@@ -98,7 +98,7 @@
 </template>
 
 <script setup lang="ts">
-import { useGame } from '~/composables/useGame';
+import { usePexesoGame } from '~/composables/usePexesoGame';
 import { useGameSettings } from '~/composables/useGameSettings';
 import { FONT_SIZE_OPTIONS } from '~/composables/constants';
 import PexesoCard from '~/components/PexesoCard.vue';
@@ -123,7 +123,7 @@ const {
   resetGame,
   handleBoardClick,
   flipCard,
-} = useGame(state);
+} = usePexesoGame(state);
 </script>
 
 <style scoped>

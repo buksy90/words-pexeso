@@ -2,7 +2,7 @@ import { ref, computed, watch } from 'vue';
 import type { Ref } from 'vue';
 import type { WordSetupState } from './useWordSetup';
 
-interface GameCard {
+interface PexesoGameCard {
   word: string;
   isRevealed: boolean;
   isMatched: boolean;
@@ -14,7 +14,7 @@ interface VoiceOption {
   voice: SpeechSynthesisVoice | null;
 }
 
-export function useGame(state: Ref<WordSetupState>) {
+export function usePexesoGame(state: Ref<WordSetupState>) {
   // Game state
   const moves = ref(0);
   const matchedPairs = ref(0);
@@ -36,7 +36,7 @@ export function useGame(state: Ref<WordSetupState>) {
   const isGameWon = computed(() => matchedPairs.value === totalPairs.value);
 
   // Cards
-  const shuffledCards = ref<GameCard[]>([]);
+  const shuffledCards = ref<PexesoGameCard[]>([]);
 
   // Load available voices
   const loadVoices = () => {
@@ -104,7 +104,7 @@ export function useGame(state: Ref<WordSetupState>) {
 
   // Initialize game
   const initGame = () => {
-    const cards: GameCard[] = [];
+    const cards: PexesoGameCard[] = [];
     confirmedWords.value.forEach(word => {
       for (let i = 0; i < 2; i++) {
         cards.push({ word, isRevealed: false, isMatched: false });
