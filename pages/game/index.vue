@@ -64,7 +64,6 @@
       <v-row
         class="game-grid"
         :class="{'game-won': isGameWon, 'waiting-for-click': waitingForClick}"
-        @click="handleBoardClick"
       >
         <v-col
           v-for="(card, index) in shuffledCards"

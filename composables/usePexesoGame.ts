@@ -1,4 +1,4 @@
-import { ref, computed, watch } from 'vue';
+import { ref, computed, watch, onUnmounted } from 'vue';
 import type { Ref } from 'vue';
 import type { WordSetupState } from './useWordSetup';
 
@@ -212,6 +212,17 @@ export function usePexesoGame(state: Ref<WordSetupState>) {
 
   // Initialize game state
   initGame();
+
+  // Register a document click listener so clicks anywhere in the app
+  // will trigger `handleBoardClick`. We remove the listener on unmount
+  // so the composable does not leak handlers between component mounts.
+  if (typeof document !== 'undefined') {
+    const onDocumentClick = () => handleBoardClick();
+    document.addEventListener('click', onDocumentClick);
+    onUnmounted(() => {
+      document.removeEventListener('click', onDocumentClick);
+    });
+  }
 
   return {
     // state
