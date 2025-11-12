@@ -34,6 +34,21 @@ Implemented: **3.3 Dynamic Font Size Control**
 
 Players can now adjust the font size while playing the game using a dropdown selector in the game stats area. Choose from five sizes: Small (16px), Medium (20px), Large (24px), Extra Large (32px), and Huge (40px). The font size changes are applied immediately to all cards and persist in localStorage. This helps accommodate different screen sizes and reading preferences.
 
+Implemented: **3.4 Extract game logic into separate composable**
+
+The core game logic (shuffle, flip handling, match detection, move counting, speech synthesis control and related state) has been moved out of `pages/game/index.vue` into a dedicated composable: `composables/useGame.ts`.
+
+What changed:
+- `composables/useGame.ts` — new composable containing game state and actions (initGame, resetGame, flipCard, handleBoardClick, speakWord, voice loading).
+- `pages/game/index.vue` — now imports and consumes the composable and focuses on rendering UI and bindings only.
+
+Benefits:
+- Separation of concerns and easier unit testing of game logic.
+- Reusable game state across other views or tools (if needed).
+- Smaller, more focused page component that's simpler to maintain.
+
+Validation: the project builds successfully after the change (client & server bundles generated).
+
 Implemented: **3.2 Click-to-Continue Card Flipping**
 
 When two non-matching cards are revealed, they now stay visible until the player clicks anywhere on the game board. This gives young players more time to read and compare both words. A helpful "Click anywhere to continue..." message appears at the bottom of the screen to guide the player. This replaces the previous auto-flip timeout behavior.
