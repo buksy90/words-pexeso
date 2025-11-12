@@ -24,6 +24,9 @@ The game helps children develop **letter order awareness**. During gameplay, chi
  - 3.5 Add unit tests to game logic
  - 3.6 Add leaderscore (saved into local storage)
  - 3.7 Report repeating words on confirm page when same word is entered multiple times. Add some error state to input
+4. More games
+ - 4.1 A puzzle-style game where players see an image of an object, animal, or person, and are presented with a queue of letters. The objective is to select letters in the correct order to spell the word represented by the image.
+ - 4.2 A logic-based adventure game where the player starts at the center of a 10×10 grid and must reach the edge by solving simple math equations. Each move presents an equation, with one neighboring cell containing the correct answer—guiding the player safely forward. Incorrect moves trigger hidden bombs, adding tension and rewarding both accuracy and strategic thinking.
 
 ## Current Implementation
 
