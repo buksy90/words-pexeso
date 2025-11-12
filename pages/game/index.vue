@@ -39,7 +39,7 @@
         </v-col>
         <v-col cols="12" sm="2">
           <v-select
-            v-model="settings.fontSize"
+            v-model="gameSettings.settings.value.fontSize"
             :items="FONT_SIZE_OPTIONS"
             item-title="name"
             item-value="value"
@@ -71,7 +71,7 @@
           :key="index"
           cols="6" sm="4" md="3" lg="2"
         >
-          <PexesoCard :card="card" :index="index" :settings="settings" @flip="flipCard" />
+          <PexesoCard :card="card" :index="index" :settings="gameSettings" @flip="flipCard" />
         </v-col>
       </v-row>
 
@@ -103,7 +103,7 @@ import { useGameSettings, FONT_SIZE_OPTIONS } from '~/composables/useGameSetting
 import PexesoCard from '~/components/PexesoCard.vue';
 import { useWordSetup } from '~/composables/useWordSetup';
 
-const { settings } = useGameSettings();
+const gameSettings = useGameSettings();
 const { state } = useWordSetup();
 
 const {

@@ -17,6 +17,13 @@ export interface FontSizeOption {
   value: number;
 }
 
+// Return type for the composable so components can accept the whole instance
+export interface UseGameSettingsReturn {
+  settings: Ref<GameSettings>;
+  FONT_OPTIONS: FontOption[];
+  FONT_SIZE_OPTIONS: FontSizeOption[];
+}
+
 // Available font options
 export const FONT_OPTIONS: FontOption[] = [
   {
@@ -75,7 +82,7 @@ export const FONT_SIZE_OPTIONS: FontSizeOption[] = [
   { name: 'Huge', value: 40 }
 ];
 
-export function useGameSettings() {
+export function useGameSettings(): UseGameSettingsReturn {
   const STORAGE_KEY = 'pexeso_game_settings';
 
   // Persistent state

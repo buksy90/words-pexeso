@@ -22,7 +22,7 @@
         >
           <span
             class="card-word"
-            :style="{ fontFamily: settings.fontFamily, fontSize: `${settings.fontSize}px` }"
+            :style="{ fontFamily: fontFamily, fontSize: `${fontSize}px` }"
           >{{ card.word }}</span>
         </v-card>
       </div>
@@ -31,10 +31,19 @@
 </template>
 
 <script setup lang="ts">
-import { defineProps, defineEmits } from 'vue';
+import { defineProps, defineEmits, computed } from 'vue';
 
-const props = defineProps<{ card: { word: string; isRevealed: boolean; isMatched: boolean }, index: number, settings: { fontFamily: string; fontSize: number } }>();
+const props = defineProps<{
+  card: { word: string; isRevealed: boolean; isMatched: boolean },
+  index: number,
+  // Accept the full composable instance so the component can read reactive values
+  settings: { settings: { value: { fontFamily: string; fontSize: number } } }
+}>();
 const { card, index, settings } = props;
+
+// Read reactive values from the passed composable instance
+const fontFamily = computed(() => settings?.settings?.value?.fontFamily ?? 'inherit');
+const fontSize = computed(() => settings?.settings?.value?.fontSize ?? 20);
 const emit = defineEmits<{ (e: 'flip', index: number): void }>();
 </script>
 
