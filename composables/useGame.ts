@@ -1,5 +1,6 @@
-import { ref, computed, watch, onMounted } from 'vue';
-import { useWordSetup } from '~/composables/useWordSetup';
+import { ref, computed, watch } from 'vue';
+import type { Ref } from 'vue';
+import type { WordSetupState } from './useWordSetup';
 
 interface GameCard {
   word: string;
@@ -13,9 +14,7 @@ interface VoiceOption {
   voice: SpeechSynthesisVoice | null;
 }
 
-export function useGame() {
-  const { state } = useWordSetup();
-
+export function useGame(state: Ref<WordSetupState>) {
   // Game state
   const moves = ref(0);
   const matchedPairs = ref(0);
@@ -202,16 +201,17 @@ export function useGame() {
     initGame();
   });
 
-  onMounted(() => {
-    if (typeof window !== 'undefined' && window.speechSynthesis) {
-      loadVoices();
-      if (window.speechSynthesis.onvoiceschanged !== undefined) {
-        window.speechSynthesis.onvoiceschanged = loadVoices;
-      }
+  // Initialize voices (if available) and game immediately. This avoids relying on
+  // Vue lifecycle hooks so the composable is test-friendly.
+  if (typeof window !== 'undefined' && window.speechSynthesis) {
+    loadVoices();
+    if (window.speechSynthesis.onvoiceschanged !== undefined) {
+      window.speechSynthesis.onvoiceschanged = loadVoices;
     }
+  }
 
-    initGame();
-  });
+  // Initialize game state
+  initGame();
 
   return {
     // state

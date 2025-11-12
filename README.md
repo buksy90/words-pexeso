@@ -49,6 +49,31 @@ Benefits:
 
 Validation: the project builds successfully after the change (client & server bundles generated).
 
+Implemented: **3.5 Unit tests for game logic**
+
+Unit tests were added to cover the extracted game logic in `composables/useGame.ts`.
+
+What changed / files added:
+- `vitest.config.ts` — Vitest configuration (jsdom environment).
+- `tests/useGame.spec.ts` — Unit test covering card creation, flip and match behavior.
+- `package.json` — `test` script (`vitest`) and devDependencies added for running tests.
+- Dev dependencies installed: `vitest`, `@vue/test-utils`, `jsdom`.
+- Minor composable change: `useGame` now accepts the game state (word setup state) as an argument to improve testability.
+
+How to run tests locally:
+
+```bash
+npm run test
+```
+
+Validation:
+- The new unit tests run locally and pass (happy-path: card generation and match detection).
+- The project still builds successfully after the changes.
+
+Notes & next steps:
+- The tests currently exercise the happy path (matching flow). It's recommended to add tests for edge cases: non-matching flow and `handleBoardClick` flip-back behavior, voice/speech behavior (mocking SpeechSynthesis), and re-initialization when `confirmedWords` change.
+- Consider adding a CI workflow (GitHub Actions) to run tests on push/PR.
+
 Implemented: **3.2 Click-to-Continue Card Flipping**
 
 When two non-matching cards are revealed, they now stay visible until the player clicks anywhere on the game board. This gives young players more time to read and compare both words. A helpful "Click anywhere to continue..." message appears at the bottom of the screen to guide the player. This replaces the previous auto-flip timeout behavior.

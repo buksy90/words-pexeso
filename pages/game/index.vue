@@ -136,6 +136,9 @@ import { useGame } from '~/composables/useGame';
 import { useGameSettings, FONT_SIZE_OPTIONS } from '~/composables/useGameSettings';
 
 const { settings } = useGameSettings();
+const { state } = useWordSetup();
+
+
 const {
   moves,
   matchedPairs,
@@ -152,7 +155,7 @@ const {
   resetGame,
   handleBoardClick,
   flipCard,
-} = useGame();
+} = useGame(state);
 </script>
 
 <style scoped>

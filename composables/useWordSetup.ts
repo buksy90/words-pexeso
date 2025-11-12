@@ -1,6 +1,7 @@
 import type { Ref } from 'vue';
 import { onMounted, watch } from 'vue';
 import { useCharacters } from './useCharacters';
+//import { useState} from 'nuxt/config';
 
 export interface WordSetupState {
   minLength: number;
