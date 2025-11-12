@@ -1,5 +1,6 @@
 import type { Ref } from 'vue';
 import { onMounted, watch } from 'vue';
+import { useLocalStorage } from './useLocalStorage';
 
 // Composable to manage active characters selection for the game setup
 export function useCharacters() {
@@ -9,29 +10,31 @@ export function useCharacters() {
   // Persistence key
   const STORAGE_KEY = 'pexeso_active_chars';
 
-  // Load from localStorage on client mount
-  onMounted(() => {
-    try {
-      const raw = localStorage.getItem(STORAGE_KEY);
-      if (raw) {
-        const arr = JSON.parse(raw);
-        if (Array.isArray(arr)) {
-          active.value = arr.filter(c => typeof c === 'string');
-        }
-      }
-    } catch (e) {
-      // silent fail
-    }
-  });
+  // Use the shared useLocalStorage composable for persistence
+  const storage = useLocalStorage<string[]>(STORAGE_KEY);
 
-  // Persist whenever it changes
-  watch(active, (val) => {
-    try {
-      localStorage.setItem(STORAGE_KEY, JSON.stringify(val));
-    } catch (e) {
-      // ignore quota errors
-    }
-  }, { deep: true });
+  // Load from storage on client mount
+  if (typeof window !== 'undefined') {
+    onMounted(() => {
+      try {
+        const state = storage.load();
+        if (state && Array.isArray(state)) {
+          active.value = state.filter(c => typeof c === 'string');
+        }
+      } catch (e) {
+        // silent fail
+      }
+    });
+
+    // Persist whenever it changes
+    watch(active, (val) => {
+      try {
+        storage.save(val);
+      } catch (e) {
+        // ignore quota errors
+      }
+    }, { deep: true });
+  }
 
   const toggle = (ch: string) => {
     const idx = active.value.indexOf(ch);
