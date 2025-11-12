@@ -27,7 +27,7 @@ The game helps children develop **letter order awareness**. During gameplay, chi
  - 3.8 Export rendering of pexeso card from pages/game/index.vue into components/PexesoCard.vue component
 4. More games
  - 4.0 Move existing pexeso game into subpage. Update index page to list all available games.
- - 4.1 A puzzle-style game where players see an image of an object, animal, or person, and are presented with a queue of letters. The objective is to select letters in the correct order to spell the word represented by the image.
+ - 4.1 A puzzle-style game where players see an image of an object, animal, or person, and are presented with a queue of letters. The objective is to select letters in the correct order to spell the word represented by the image. The list of objects/animals/persons must be auto detected from assets directory (public/things/*.png|jpg) upon application build. There must be new sub page created for the game.
  - 4.2 A logic-based adventure game where the player starts at the center of a 10×10 grid and must reach the edge by solving simple math equations. Each move presents an equation, with one neighboring cell containing the correct answer—guiding the player safely forward. Incorrect moves trigger hidden bombs, adding tension and rewarding both accuracy and strategic thinking.
 
 ## Current Implementation
