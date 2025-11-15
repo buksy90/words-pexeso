@@ -32,6 +32,37 @@ The game helps children develop **letter order awareness**. During gameplay, chi
 
 ## Current Implementation
 
+Implemented: **4.1 Spell the Word Game**
+
+A new puzzle-style game has been added where players see an image of an object, animal, or person and must select letters in the correct order to spell the corresponding word.
+
+What was implemented:
+- `composables/useThings.ts` — Manages available images and their corresponding words from `public/things/` directory (currently includes: lama, lev, mama)
+- `composables/useSpellGame.ts` — Core game logic for the spell game including:
+  - Random image selection
+  - Letter shuffling to create the puzzle queue
+  - Letter selection and order validation
+  - Automatic word checking when complete
+  - Score and attempt tracking
+  - Undo and reset functionality
+- `pages/spell-game/index.vue` — Full game UI with:
+  - Image display
+  - Interactive letter queue with clickable tiles
+  - Visual feedback for selected letters
+  - Success/error animations
+  - Score tracking and game controls
+- `pages/index.vue` — Updated to show both available games (Pexeso and Spell Game) as clickable cards
+- `app.vue` — Navigation updated to include link to the new spell game
+
+Game features:
+- Players see an image and must spell the word by selecting shuffled letters in the correct order
+- Instant visual feedback with animations when word is complete
+- Score tracking across multiple rounds
+- Ability to undo last letter or reset the current round
+- Auto-advances to next word after correct spelling
+
+Validation: The project builds successfully with the new spell game integrated.
+
 Implemented: **3.3 Dynamic Font Size Control**
 
 Players can now adjust the font size while playing the game using a dropdown selector in the game stats area. Choose from five sizes: Small (16px), Medium (20px), Large (24px), Extra Large (32px), and Huge (40px). The font size changes are applied immediately to all cards and persist in localStorage. This helps accommodate different screen sizes and reading preferences.
