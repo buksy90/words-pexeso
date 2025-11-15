@@ -1,17 +1,12 @@
 import { ref, computed, watch, onUnmounted } from 'vue';
 import type { Ref } from 'vue';
 import type { WordSetupState } from './useWordSetup';
+import { useSpeech } from './useSpeech';
 
 interface PexesoGameCard {
   word: string;
   isRevealed: boolean;
   isMatched: boolean;
-}
-
-interface VoiceOption {
-  label: string;
-  value: string;
-  voice: SpeechSynthesisVoice | null;
 }
 
 export function usePexesoGame(state: Ref<WordSetupState>) {
@@ -24,10 +19,8 @@ export function usePexesoGame(state: Ref<WordSetupState>) {
   const isLocked = ref(false);
   const waitingForClick = ref(false);
 
-  // Speech synthesis state
-  const availableVoices = ref<VoiceOption[]>([]);
-  const selectedVoice = ref<string>('');
-  const speechSynthesis = ref<SpeechSynthesis | null>(null);
+  // Speech synthesis
+  const { availableVoices, selectedVoice, speak } = useSpeech('pexeso_voice');
 
   // Confirmed words (source of truth)
   const confirmedWords = computed(() => state.value.confirmedWords);
@@ -37,70 +30,6 @@ export function usePexesoGame(state: Ref<WordSetupState>) {
 
   // Cards
   const shuffledCards = ref<PexesoGameCard[]>([]);
-
-  // Load available voices
-  const loadVoices = () => {
-    if (typeof window === 'undefined' || !window.speechSynthesis) return;
-
-    const synth = window.speechSynthesis;
-    speechSynthesis.value = synth;
-
-    const voices = synth.getVoices();
-
-    // Filter and format voices
-    const voiceOptions: VoiceOption[] = voices.map(voice => ({
-      label: `${voice.name} (${voice.lang})`,
-      value: voice.name,
-      voice: voice
-    }));
-
-    availableVoices.value = voiceOptions;
-
-    // Set default voice (prefer Slovak, then Czech, then first available)
-    if (voiceOptions.length > 0) {
-      const defaultVoice =
-        voiceOptions.find(v => v.voice?.lang.startsWith('sk')) ||
-        voiceOptions.find(v => v.voice?.lang.startsWith('cs')) ||
-        voiceOptions[0];
-      selectedVoice.value = defaultVoice?.value || '';
-
-      // Load from localStorage
-      const savedVoice = localStorage.getItem('pexeso_voice');
-      if (savedVoice && voiceOptions.find(v => v.value === savedVoice)) {
-        selectedVoice.value = savedVoice;
-      }
-    }
-  };
-
-  // Save voice preference
-  watch(selectedVoice, (newVoice) => {
-    if (typeof window !== 'undefined' && newVoice) {
-      localStorage.setItem('pexeso_voice', newVoice);
-    }
-  });
-
-  // Speak a word
-  const speakWord = (word: string) => {
-    if (typeof window === 'undefined' || !speechSynthesis.value || !word) return;
-
-    // Cancel any ongoing speech
-    speechSynthesis.value.cancel();
-
-    const utterance = new SpeechSynthesisUtterance(word);
-
-    // Find and set the selected voice
-    const voiceOption = availableVoices.value.find(v => v.value === selectedVoice.value);
-    if (voiceOption?.voice) {
-      utterance.voice = voiceOption.voice;
-    }
-
-    // Adjust speech parameters for children
-    utterance.rate = 0.8;
-    utterance.pitch = 1.1;
-    utterance.volume = 1.0;
-
-    speechSynthesis.value.speak(utterance);
-  };
 
   // Initialize game
   const initGame = () => {
@@ -167,7 +96,7 @@ export function usePexesoGame(state: Ref<WordSetupState>) {
     card.isRevealed = true;
 
     // Speak the word
-    speakWord(card.word);
+    speak(card.word);
 
     if (firstCard.value === null) {
       firstCard.value = index;
@@ -201,15 +130,6 @@ export function usePexesoGame(state: Ref<WordSetupState>) {
     initGame();
   });
 
-  // Initialize voices (if available) and game immediately. This avoids relying on
-  // Vue lifecycle hooks so the composable is test-friendly.
-  if (typeof window !== 'undefined' && window.speechSynthesis) {
-    loadVoices();
-    if (window.speechSynthesis.onvoiceschanged !== undefined) {
-      window.speechSynthesis.onvoiceschanged = loadVoices;
-    }
-  }
-
   // Initialize game state
   initGame();
 
@@ -238,8 +158,7 @@ export function usePexesoGame(state: Ref<WordSetupState>) {
     gameStarted,
     isGameWon,
     // actions
-    loadVoices,
-    speakWord,
+    speak,
     initGame,
     resetGame,
     handleBoardClick,
