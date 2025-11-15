@@ -82,9 +82,9 @@ export const useSpellGame = () => {
    * Initialize a new round with a random thing
    */
   const initRound = () => {
-    const thing = getRandomThing()
+    const thing = getRandomThing(difficulty.value)
     if (!thing) {
-      console.error('No things available for spell game')
+      console.error(`No things available for difficulty: ${difficulty.value}`)
       return
     }
 
@@ -127,8 +127,8 @@ export const useSpellGame = () => {
     attempts.value = 0
     score.value = 0
     completedWords.value = new Set()
-    const { thingsCount } = useThings()
-    totalWords.value = thingsCount.value
+    const { getThingsCountByDifficulty } = useThings()
+    totalWords.value = getThingsCountByDifficulty(selectedDifficulty)
     initRound()
   }
 
