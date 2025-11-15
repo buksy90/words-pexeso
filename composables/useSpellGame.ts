@@ -29,6 +29,8 @@ export const useSpellGame = () => {
   const gameStarted = ref(false)
   const activePosition = ref(0)
   const difficulty = ref<Difficulty>('easy')
+  const currentRoundAttempts = ref(0)
+  const potentialPoints = ref(0)
 
   // Computed properties
   const targetWord = computed(() => currentThing.value?.word || '')
@@ -88,6 +90,8 @@ export const useSpellGame = () => {
     selectedLetters.value = Array(thing.word.length).fill(null)
     isCorrect.value = null
     activePosition.value = 0
+    currentRoundAttempts.value = 0
+    potentialPoints.value = thing.word.length
 
     // Create letter tiles from the word
     const wordLetters = thing.word.split('')
@@ -199,11 +203,17 @@ export const useSpellGame = () => {
     if (selectedLetters.value.length === 0) return
 
     attempts.value++
+    currentRoundAttempts.value++
     const correct = currentWord.value === targetWord.value
     isCorrect.value = correct
 
     if (correct) {
-      score.value++
+      // Award points: 1 per letter, minus penalty for failed attempts
+      const pointsEarned = Math.max(1, potentialPoints.value)
+      score.value += pointsEarned
+    } else {
+      // Decrease potential points for next attempt, but keep minimum of 1
+      potentialPoints.value = Math.max(1, potentialPoints.value - 1)
     }
   }
 
@@ -228,6 +238,7 @@ export const useSpellGame = () => {
     selectedLetters.value = Array(wordLength).fill(null)
     isCorrect.value = null
     activePosition.value = 0
+    // Keep potentialPoints as it decreases with each failed attempt
   }
 
   return {
@@ -241,6 +252,7 @@ export const useSpellGame = () => {
     gameStarted: computed(() => gameStarted.value),
     activePosition: computed(() => activePosition.value),
     difficulty: computed(() => difficulty.value),
+    potentialPoints: computed(() => potentialPoints.value),
 
     // Computed
     targetWord,
