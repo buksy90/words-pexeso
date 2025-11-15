@@ -10,7 +10,7 @@ describe('PexesoCard.vue', () => {
         card,
         index: 0,
         settings: { fontFamily: 'Arial', fontSize: 16 }
-      }
+      },
     });
 
     // Initially should not have flipped class
