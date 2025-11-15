@@ -134,6 +134,28 @@
                 class="mx-auto rounded-lg elevation-4"
                 cover
               />
+              <div v-if="currentThing" class="d-flex justify-center align-center gap-2 mt-4">
+                <v-select
+                  v-model="selectedVoice"
+                  :items="availableVoices"
+                  item-title="label"
+                  item-value="value"
+                  label="Voice"
+                  variant="outlined"
+                  density="compact"
+                  class="mr-3"
+                  style="max-width: 300px;"
+                  hide-details
+                />
+                <v-btn
+                  color="primary"
+                  variant="outlined"
+                  prepend-icon="mdi-volume-high"
+                  @click="handleListen"
+                >
+                  Listen
+                </v-btn>
+              </div>
             </div>
 
             <!-- Selected Letters Display -->
@@ -260,6 +282,7 @@
 
 <script setup lang="ts">
 import { useSpellGame, type Difficulty } from '~/composables/useSpellGame'
+import { useSpeech } from '~/composables/useSpeech'
 
 const {
   // State
@@ -289,6 +312,9 @@ const {
   nextRound,
 } = useSpellGame()
 
+// Text-to-speech
+const { speak, availableVoices, selectedVoice } = useSpeech('spell_game_voice')
+
 const handleStartGame = (selectedDifficulty: Difficulty) => {
   startGame(selectedDifficulty)
 }
@@ -303,6 +329,13 @@ const handlePositionClick = (index: number) => {
   } else {
     // Set this as the active position
     setActivePosition(index)
+  }
+}
+
+// Listen button handler
+const handleListen = () => {
+  if (targetWord.value) {
+    speak(targetWord.value)
   }
 }
 
