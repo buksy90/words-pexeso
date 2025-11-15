@@ -4,20 +4,61 @@
 -->
 <template>
   <v-container class="py-8">
-    <!-- Start Screen -->
+    <!-- Start Screen - Difficulty Selection -->
     <div v-if="!gameStarted" class="text-center">
       <h1 class="text-h3 mb-4">Spell the Word Game</h1>
-      <p class="text-h6 text-grey mb-8">
+      <p class="text-h6 text-grey mb-6">
         Look at the picture and spell the word by selecting letters in the correct order!
       </p>
-      <v-btn
-        color="primary"
-        size="x-large"
-        prepend-icon="mdi-play"
-        @click="startGame"
-      >
-        Start Game
-      </v-btn>
+      <p class="text-subtitle-1 mb-8">Choose your difficulty level:</p>
+
+      <v-row justify="center" class="mb-4">
+        <v-col cols="12" md="4">
+          <v-card
+            class="difficulty-card pa-6"
+            hover
+            elevation="4"
+            @click="handleStartGame('easy')"
+          >
+            <v-icon size="x-large" color="success" class="mb-3">mdi-emoticon-happy</v-icon>
+            <h3 class="text-h5 mb-3">Easy</h3>
+            <p class="text-body-1">
+              Only the correct letters are displayed.
+              Perfect for beginners!
+            </p>
+          </v-card>
+        </v-col>
+        <v-col cols="12" md="4">
+          <v-card
+            class="difficulty-card pa-6"
+            hover
+            elevation="4"
+            @click="handleStartGame('medium')"
+          >
+            <v-icon size="x-large" color="warning" class="mb-3">mdi-emoticon-neutral</v-icon>
+            <h3 class="text-h5 mb-3">Medium</h3>
+            <p class="text-body-1">
+              Correct letters + 2 incorrect letters.
+              A bit more challenging!
+            </p>
+          </v-card>
+        </v-col>
+        <v-col cols="12" md="4">
+          <v-card
+            class="difficulty-card pa-6"
+            hover
+            elevation="4"
+            @click="handleStartGame('hard')"
+          >
+            <v-icon size="x-large" color="error" class="mb-3">mdi-emoticon-cool</v-icon>
+            <h3 class="text-h5 mb-3">Hard</h3>
+            <p class="text-body-1">
+              Correct letters + up to 5 incorrect letters.
+              For spelling masters!
+            </p>
+          </v-card>
+        </v-col>
+      </v-row>
     </div>
 
     <!-- Game Screen -->
@@ -41,7 +82,7 @@
             color="error"
             variant="outlined"
             prepend-icon="mdi-restart"
-            @click="startGame"
+            @click="handleStartGame(difficulty)"
           >
             New Game
           </v-btn>
@@ -179,7 +220,7 @@
 </template>
 
 <script setup lang="ts">
-import { useSpellGame } from '~/composables/useSpellGame'
+import { useSpellGame, type Difficulty } from '~/composables/useSpellGame'
 
 const {
   // State
@@ -192,6 +233,7 @@ const {
   gameStarted,
   targetWord,
   activePosition,
+  difficulty,
 
   // Actions
   startGame,
@@ -203,6 +245,10 @@ const {
   resetRound,
   nextRound,
 } = useSpellGame()
+
+const handleStartGame = (selectedDifficulty: Difficulty) => {
+  startGame(selectedDifficulty)
+}
 
 const handlePositionClick = (index: number) => {
   if (isCorrect.value !== null) return
@@ -332,5 +378,15 @@ const handlePositionClick = (index: number) => {
   0%, 100% { transform: translateX(0); }
   25% { transform: translateX(-10px); }
   75% { transform: translateX(10px); }
+}
+
+.difficulty-card {
+  cursor: pointer;
+  transition: all 0.3s ease;
+  height: 100%;
+}
+
+.difficulty-card:hover {
+  transform: translateY(-8px);
 }
 </style>

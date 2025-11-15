@@ -6,6 +6,9 @@
 
 import { ref, computed, watch } from 'vue'
 import { useThings, type Thing } from './useThings'
+import { useCharacters } from './useCharacters'
+
+export type Difficulty = 'easy' | 'medium' | 'hard'
 
 export interface LetterTile {
   letter: string
@@ -25,6 +28,7 @@ export const useSpellGame = () => {
   const score = ref(0)
   const gameStarted = ref(false)
   const activePosition = ref(0)
+  const difficulty = ref<Difficulty>('easy')
 
   // Computed properties
   const targetWord = computed(() => currentThing.value?.word || '')
@@ -53,6 +57,24 @@ export const useSpellGame = () => {
   }
 
   /**
+   * Get incorrect letters to add based on difficulty
+   */
+  const getIncorrectLetters = (wordLetters: string[]): string[] => {
+    const { active } = useCharacters()
+    const incorrectCount = difficulty.value === 'medium' ? 2 : difficulty.value === 'hard' ? 5 : 0
+
+    if (incorrectCount === 0) return []
+
+    // Get available characters that are not in the current word
+    const wordLetterSet = new Set(wordLetters.map(l => l.toLowerCase()))
+    const availableChars = active.value.filter(char => !wordLetterSet.has(char.toLowerCase()))
+
+    // Shuffle and take the required number
+    const shuffled = shuffleArray(availableChars)
+    return shuffled.slice(0, Math.min(incorrectCount, shuffled.length))
+  }
+
+  /**
    * Initialize a new round with a random thing
    */
   const initRound = () => {
@@ -68,21 +90,31 @@ export const useSpellGame = () => {
     activePosition.value = 0
 
     // Create letter tiles from the word
-    const letters = thing.word.split('').map((letter, index) => ({
+    const wordLetters = thing.word.split('')
+    const letters = wordLetters.map((letter, index) => ({
       letter,
       id: index,
       selected: false,
     }))
 
-    // Shuffle the letters to create the queue
-    letterQueue.value = shuffleArray(letters)
+    // Add incorrect letters based on difficulty
+    const incorrectLetters = getIncorrectLetters(wordLetters)
+    const incorrectTiles = incorrectLetters.map((letter, index) => ({
+      letter,
+      id: thing.word.length + index,
+      selected: false,
+    }))
+
+    // Combine and shuffle all letters
+    letterQueue.value = shuffleArray([...letters, ...incorrectTiles])
     gameStarted.value = true
   }
 
   /**
    * Start a new game
    */
-  const startGame = () => {
+  const startGame = (selectedDifficulty: Difficulty = 'easy') => {
+    difficulty.value = selectedDifficulty
     attempts.value = 0
     score.value = 0
     initRound()
@@ -208,6 +240,7 @@ export const useSpellGame = () => {
     score: computed(() => score.value),
     gameStarted: computed(() => gameStarted.value),
     activePosition: computed(() => activePosition.value),
+    difficulty: computed(() => difficulty.value),
 
     // Computed
     targetWord,
