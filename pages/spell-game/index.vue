@@ -63,6 +63,26 @@
 
     <!-- Game Screen -->
     <template v-else>
+      <!-- Progress Bar -->
+      <v-card class="mb-4" variant="outlined">
+        <v-card-text class="pb-2">
+          <div class="d-flex justify-space-between align-center mb-2">
+            <span class="text-subtitle-1 font-weight-bold">Progress</span>
+            <span class="text-subtitle-2">{{ completedWordsCount }} / {{ totalWords }} words</span>
+          </div>
+          <v-progress-linear
+            :model-value="progressPercentage"
+            color="success"
+            height="12"
+            rounded
+          >
+            <template v-slot:default>
+              <strong class="text-caption">{{ progressPercentage }}%</strong>
+            </template>
+          </v-progress-linear>
+        </v-card-text>
+      </v-card>
+
       <!-- Game Stats -->
       <v-row class="mb-6">
         <v-col cols="12" sm="3">
@@ -254,6 +274,9 @@ const {
   activePosition,
   difficulty,
   potentialPoints,
+  completedWordsCount,
+  totalWords,
+  progressPercentage,
 
   // Actions
   startGame,

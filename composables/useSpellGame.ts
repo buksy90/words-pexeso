@@ -31,6 +31,8 @@ export const useSpellGame = () => {
   const difficulty = ref<Difficulty>('easy')
   const currentRoundAttempts = ref(0)
   const potentialPoints = ref(0)
+  const completedWords = ref<Set<string>>(new Set())
+  const totalWords = ref(0)
 
   // Computed properties
   const targetWord = computed(() => currentThing.value?.word || '')
@@ -91,7 +93,10 @@ export const useSpellGame = () => {
     isCorrect.value = null
     activePosition.value = 0
     currentRoundAttempts.value = 0
-    potentialPoints.value = thing.word.length
+    
+    // Calculate potential points based on word length and difficulty bonus
+    const difficultyBonus = difficulty.value === 'medium' ? 1 : difficulty.value === 'hard' ? 2 : 0
+    potentialPoints.value = thing.word.length + difficultyBonus
 
     // Create letter tiles from the word
     const wordLetters = thing.word.split('')
@@ -121,6 +126,9 @@ export const useSpellGame = () => {
     difficulty.value = selectedDifficulty
     attempts.value = 0
     score.value = 0
+    completedWords.value = new Set()
+    const { thingsCount } = useThings()
+    totalWords.value = thingsCount.value
     initRound()
   }
 
@@ -211,6 +219,10 @@ export const useSpellGame = () => {
       // Award points: 1 per letter, minus penalty for failed attempts
       const pointsEarned = Math.max(1, potentialPoints.value)
       score.value += pointsEarned
+      // Track completed word
+      if (currentThing.value) {
+        completedWords.value.add(currentThing.value.word)
+      }
     } else {
       // Decrease potential points for next attempt, but keep minimum of 1
       potentialPoints.value = Math.max(1, potentialPoints.value - 1)
@@ -253,6 +265,11 @@ export const useSpellGame = () => {
     activePosition: computed(() => activePosition.value),
     difficulty: computed(() => difficulty.value),
     potentialPoints: computed(() => potentialPoints.value),
+    completedWordsCount: computed(() => completedWords.value.size),
+    totalWords: computed(() => totalWords.value),
+    progressPercentage: computed(() =>
+      totalWords.value > 0 ? Math.round((completedWords.value.size / totalWords.value) * 100) : 0
+    ),
 
     // Computed
     targetWord,
