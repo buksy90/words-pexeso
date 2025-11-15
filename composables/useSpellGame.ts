@@ -93,7 +93,7 @@ export const useSpellGame = () => {
     isCorrect.value = null
     activePosition.value = 0
     currentRoundAttempts.value = 0
-    
+
     // Calculate potential points based on word length and difficulty bonus
     const difficultyBonus = difficulty.value === 'medium' ? 1 : difficulty.value === 'hard' ? 2 : 0
     potentialPoints.value = thing.word.length + difficultyBonus
