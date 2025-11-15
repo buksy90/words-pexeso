@@ -305,6 +305,31 @@ const handlePositionClick = (index: number) => {
     setActivePosition(index)
   }
 }
+
+// Keyboard event handler
+const handleKeyPress = (event: KeyboardEvent) => {
+  if (!gameStarted.value || isCorrect.value !== null) return
+
+  const key = event.key.toLowerCase()
+
+  // Find the first available (not selected) letter tile that matches the pressed key
+  const availableTile = letterQueue.value.find(
+    tile => !tile.selected && tile.letter.toLowerCase() === key
+  )
+
+  if (availableTile) {
+    selectLetter(availableTile)
+  }
+}
+
+// Add keyboard event listener on mount, remove on unmount
+onMounted(() => {
+  window.addEventListener('keydown', handleKeyPress)
+})
+
+onBeforeUnmount(() => {
+  window.removeEventListener('keydown', handleKeyPress)
+})
 </script>
 
 <style scoped>
