@@ -310,6 +310,7 @@ const {
   checkWord,
   resetRound,
   nextRound,
+  decrementPotentialPoints,
 } = useSpellGame()
 
 // Text-to-speech
@@ -336,6 +337,7 @@ const handlePositionClick = (index: number) => {
 const handleListen = () => {
   if (targetWord.value) {
     speak(targetWord.value)
+    decrementPotentialPoints()
   }
 }
 

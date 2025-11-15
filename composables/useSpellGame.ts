@@ -272,6 +272,13 @@ export const useSpellGame = () => {
     // Keep potentialPoints as it decreases with each failed attempt
   }
 
+  /**
+   * Decrement potential points (called when player uses hints like listening)
+   */
+  const decrementPotentialPoints = () => {
+    potentialPoints.value = Math.max(1, potentialPoints.value - 1)
+  }
+
   return {
     // State
     currentThing: computed(() => currentThing.value),
@@ -306,5 +313,6 @@ export const useSpellGame = () => {
     checkWord,
     nextRound,
     resetRound,
+    decrementPotentialPoints,
   }
 }
