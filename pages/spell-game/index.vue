@@ -71,24 +71,19 @@
               <div class="selected-letters-container">
                 <div
                   v-for="(tile, index) in selectedLetters"
-                  :key="`selected-${tile.id}`"
-                  class="letter-tile selected-tile"
+                  :key="`pos-${index}`"
+                  class="letter-tile"
                   :class="{
-                    'correct-tile': isCorrect === true,
-                    'incorrect-tile': isCorrect === false,
+                    'selected-tile': tile !== null,
+                    'empty-tile': tile === null,
+                    'next-position': index === activePosition && isCorrect === null && tile === null,
+                    'correct-tile': isCorrect === true && tile !== null,
+                    'incorrect-tile': isCorrect === false && tile !== null,
                     'clickable': isCorrect === null
                   }"
-                  @click="isCorrect === null ? removeSelectedLetter(tile) : null"
+                  @click="handlePositionClick(index)"
                 >
-                  {{ tile.letter }}
-                </div>
-                <div
-                  v-for="i in (targetWord.length - selectedLetters.length)"
-                  :key="`empty-${i}`"
-                  class="letter-tile empty-tile"
-                  :class="{ 'next-position': i === 1 && isCorrect === null }"
-                >
-                  _
+                  {{ tile?.letter || '_' }}
                 </div>
               </div>
             </div>
@@ -196,16 +191,31 @@ const {
   score,
   gameStarted,
   targetWord,
+  activePosition,
 
   // Actions
   startGame,
   selectLetter,
   undoLastLetter,
   removeSelectedLetter,
+  setActivePosition,
   checkWord,
   resetRound,
   nextRound,
 } = useSpellGame()
+
+const handlePositionClick = (index: number) => {
+  if (isCorrect.value !== null) return
+
+  const tile = selectedLetters.value[index]
+  if (tile !== null) {
+    // Remove letter at this position
+    removeSelectedLetter(index)
+  } else {
+    // Set this as the active position
+    setActivePosition(index)
+  }
+}
 </script>
 
 <style scoped>
@@ -238,13 +248,18 @@ const {
   animation: slideIn 0.3s ease;
 }
 
-.selected-tile.clickable {
+.letter-tile.clickable {
   cursor: pointer;
 }
 
 .selected-tile.clickable:hover {
   background: #1976D2;
   transform: scale(0.95);
+}
+
+.empty-tile.clickable:hover:not(.next-position) {
+  background: #E8E8E8;
+  border-color: #999;
 }
 
 .empty-tile {
