@@ -82,9 +82,28 @@ export const useSpellGame = () => {
    * Initialize a new round with a random thing
    */
   const initRound = () => {
-    const thing = getRandomThing(difficulty.value)
-    if (!thing) {
+    const { getThingsByDifficulty } = useThings()
+    const availableThings = getThingsByDifficulty(difficulty.value)
+
+    // Filter out already completed words
+    const remainingThings = availableThings.filter(
+      thing => !completedWords.value.has(thing.word)
+    )
+
+    // If all words completed, start over
+    const thingsToChooseFrom = remainingThings.length > 0 ? remainingThings : availableThings
+
+    if (thingsToChooseFrom.length === 0) {
       console.error(`No things available for difficulty: ${difficulty.value}`)
+      return
+    }
+
+    // Pick a random thing from available options
+    const randomIndex = Math.floor(Math.random() * thingsToChooseFrom.length)
+    const thing = thingsToChooseFrom[randomIndex]
+
+    if (!thing) {
+      console.error(`Failed to select a thing`)
       return
     }
 
