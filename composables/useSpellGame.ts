@@ -108,10 +108,23 @@ export const useSpellGame = () => {
   }
 
   /**
+   * Remove a specific selected letter by clicking on it
+   */
+  const removeSelectedLetter = (tile: LetterTile) => {
+    if (isCorrect.value !== null) return
+
+    const index = selectedLetters.value.findIndex(t => t.id === tile.id)
+    if (index !== -1) {
+      selectedLetters.value.splice(index, 1)
+      tile.selected = false
+    }
+  }
+
+  /**
    * Check if the spelled word is correct
    */
   const checkWord = () => {
-    if (!isComplete.value) return
+    if (selectedLetters.value.length === 0) return
 
     attempts.value++
     const correct = currentWord.value === targetWord.value
@@ -141,16 +154,6 @@ export const useSpellGame = () => {
     isCorrect.value = null
   }
 
-  // Auto-check when word is complete
-  watch(isComplete, (complete) => {
-    if (complete) {
-      // Small delay for better UX
-      setTimeout(() => {
-        checkWord()
-      }, 300)
-    }
-  })
-
   return {
     // State
     currentThing: computed(() => currentThing.value),
@@ -172,6 +175,7 @@ export const useSpellGame = () => {
     initRound,
     selectLetter,
     undoLastLetter,
+    removeSelectedLetter,
     checkWord,
     nextRound,
     resetRound,

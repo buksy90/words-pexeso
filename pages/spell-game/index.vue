@@ -75,8 +75,10 @@
                   class="letter-tile selected-tile"
                   :class="{
                     'correct-tile': isCorrect === true,
-                    'incorrect-tile': isCorrect === false
+                    'incorrect-tile': isCorrect === false,
+                    'clickable': isCorrect === null
                   }"
+                  @click="isCorrect === null ? removeSelectedLetter(tile) : null"
                 >
                   {{ tile.letter }}
                 </div>
@@ -84,6 +86,7 @@
                   v-for="i in (targetWord.length - selectedLetters.length)"
                   :key="`empty-${i}`"
                   class="letter-tile empty-tile"
+                  :class="{ 'next-position': i === 1 && isCorrect === null }"
                 >
                   _
                 </div>
@@ -131,6 +134,17 @@
 
             <!-- Action Buttons -->
             <div class="text-center mt-6">
+              <v-btn
+                v-if="isCorrect === null"
+                color="success"
+                size="large"
+                prepend-icon="mdi-check"
+                class="mr-2"
+                @click="checkWord"
+                :disabled="selectedLetters.length === 0"
+              >
+                Check
+              </v-btn>
               <v-btn
                 v-if="isCorrect === null"
                 color="warning"
@@ -187,6 +201,8 @@ const {
   startGame,
   selectLetter,
   undoLastLetter,
+  removeSelectedLetter,
+  checkWord,
   resetRound,
   nextRound,
 } = useSpellGame()
@@ -222,10 +238,37 @@ const {
   animation: slideIn 0.3s ease;
 }
 
+.selected-tile.clickable {
+  cursor: pointer;
+}
+
+.selected-tile.clickable:hover {
+  background: #1976D2;
+  transform: scale(0.95);
+}
+
 .empty-tile {
   background: #f5f5f5;
   color: #9e9e9e;
   border: 2px dashed #bdbdbd;
+}
+
+.empty-tile.next-position {
+  background: #E3F2FD;
+  border: 2px dashed #2196F3;
+  border-width: 3px;
+  animation: pulse 1.5s infinite;
+}
+
+@keyframes pulse {
+  0%, 100% {
+    border-color: #2196F3;
+    background: #E3F2FD;
+  }
+  50% {
+    border-color: #1976D2;
+    background: #BBDEFB;
+  }
 }
 
 .correct-tile {
