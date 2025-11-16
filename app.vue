@@ -7,7 +7,8 @@
       </v-toolbar-title>
       <v-spacer></v-spacer>
       <v-btn to="/game" variant="text" prepend-icon="mdi-cards">Pexeso</v-btn>
-      <v-btn to="/spell-game" variant="text" prepend-icon="mdi-image-text">Spell Game</v-btn>
+      <v-btn to="/spell-game" variant="text" prepend-icon="mdi-image-text">Spell</v-btn>
+      <v-btn to="/listen-game" variant="text" prepend-icon="mdi-headphones">Listen</v-btn>
       <v-btn to="/setup" variant="text" prepend-icon="mdi-cog">Setup</v-btn>
     </v-app-bar>
 

@@ -11,3 +11,7 @@ export function shuffleArray<T,>(array: T[]): T[] {
   }
   return shuffled
 }
+
+export function voidWarning(..._args: any[]): void {
+  console.warn(..._args);
+}
