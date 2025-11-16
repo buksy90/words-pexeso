@@ -10,7 +10,7 @@ import { useCharacters } from './useCharacters'
 import { useLettersQueue } from './useLettersQueue'
 import { shuffleArray } from './helpers'
 
-export const useSpellGame = () => {
+export const useSpellGame = (charactersComposable = useCharacters()) => {
   // Game state
   const currentThing = ref<Thing | null>(null)
   const selectedLetters = ref<(LetterTile | null)[]>([])
@@ -48,7 +48,7 @@ export const useSpellGame = () => {
    * Get incorrect letters to add based on difficulty
    */
   const getIncorrectLetters = (wordLetters: string[]): string[] => {
-    const { active } = useCharacters()
+    const { active } = charactersComposable;
     const incorrectCount = difficulty.value === 'medium' ? 2 : difficulty.value === 'hard' ? 5 : 0
 
     if (incorrectCount === 0) return []

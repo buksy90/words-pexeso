@@ -2,6 +2,7 @@ import { describe, it, expect } from 'vitest';
 import { ref } from 'vue';
 
 import { usePexesoGame } from '../composables/usePexesoGame';
+import { fi } from 'vuetify/locale';
 
 describe('useGame composable', () => {
   it('initializes cards for confirmed words and allows flips and matches', () => {
@@ -33,14 +34,23 @@ describe('useGame composable', () => {
 
     expect(indicesAA.length).toBe(2);
 
+    const firstIndice = indicesAA[0]!;
+    const secondIndice = indicesAA[1]!;
+    const firstCard = game.shuffledCards.value[firstIndice]!;
+    const secondCard = game.shuffledCards.value[secondIndice]!;
+
     // Flip first 'aa'
+    expect(firstCard.isRevealed).toBe(false);
     game.flipCard(indicesAA[0]!);
-    expect(game.shuffledCards.value[indicesAA[0]].isRevealed).toBe(true);
+    expect(firstCard.isRevealed).toBe(true);
 
     // Flip second 'aa' to create match
-    game.flipCard(indicesAA[1]);
-    expect(game.shuffledCards.value[indicesAA[0]].isMatched).toBe(true);
-    expect(game.shuffledCards.value[indicesAA[1]].isMatched).toBe(true);
+    expect(secondCard.isRevealed).toBe(false);
+    game.flipCard(secondIndice);
+    expect(secondCard.isRevealed).toBe(true);
+
+    expect(firstCard.isMatched).toBe(true);
+    expect(secondCard.isMatched).toBe(true);
     expect(game.matchedPairs.value).toBe(1);
   });
 });

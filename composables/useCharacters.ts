@@ -3,9 +3,9 @@ import { onMounted, watch } from 'vue';
 import { useLocalStorage } from './useLocalStorage';
 
 // Composable to manage active characters selection for the game setup
-export function useCharacters() {
+export function useCharacters(startupChars: string[] = []) {
   // Global reactive state (Nuxt 3 useState keeps value across pages)
-  const active: Ref<string[]> = useState<string[]>('activeChars', () => []);
+  const active: Ref<string[]> = useState<string[]>('activeChars', () => startupChars);
 
   // Persistence key
   const STORAGE_KEY = 'pexeso_active_chars';
