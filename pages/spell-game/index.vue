@@ -166,7 +166,7 @@
                   }"
                   @click="handlePositionClick(index)"
                 >
-                  {{ tile?.letter || '_' }}
+                  {{ tile?.letter ? tile.letter.toUpperCase() : '_' }}
                 </div>
               </div>
             </div>
@@ -205,7 +205,7 @@
                   class="letter-queue-btn"
                   @click="selectLetter(tile)"
                 >
-                  {{ tile.letter }}
+                  {{ tile.letter.toUpperCase() }}
                 </v-btn>
               </div>
             </div>
