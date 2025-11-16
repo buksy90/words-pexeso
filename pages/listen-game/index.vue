@@ -63,6 +63,16 @@
           </v-btn>
         </v-col>
       </v-row>
+      <v-row v-if="progressFull" class="mb-6">
+        <v-col cols="12">
+          <v-alert type="success" variant="tonal" prominent>
+            <div class="text-h6">🎉 Good job! You completed the progress bar.</div>
+            <div class="mt-4">
+              <v-btn color="primary" @click="handleNewGame">New Game</v-btn>
+            </div>
+          </v-alert>
+        </v-col>
+      </v-row>
 
       <v-row>
         <v-col cols="12">
@@ -135,7 +145,7 @@
             <div class="text-center mt-6">
               <v-btn v-if="isCorrect === null" color="success" size="large" prepend-icon="mdi-check" class="mr-2" @click="checkWord" :disabled="selectedLetters.length === 0">Check</v-btn>
               <v-btn v-if="isCorrect === null" color="error" variant="outlined" prepend-icon="mdi-refresh" @click="resetRound" :disabled="selectedLetters.length === 0">Reset</v-btn>
-              <v-btn v-if="isCorrect === true" color="primary" size="large" prepend-icon="mdi-arrow-right" @click="nextRound">Next Word</v-btn>
+              <v-btn v-if="isCorrect === true && !progressFull" color="primary" size="large" prepend-icon="mdi-arrow-right" @click="nextRound">Next Word</v-btn>
               <v-btn v-if="isCorrect === false" color="warning" size="large" prepend-icon="mdi-refresh" @click="resetRound">Try Again</v-btn>
             </div>
           </v-card>
@@ -253,6 +263,19 @@ const handlePositionClick = (index: number) => {
 
 const handleListen = () => {
   if (currentWord.value) speak(currentWord.value)
+}
+
+const progressFull = computed(() => progress.value >= 10)
+
+const handleNewGame = () => {
+  // Return to difficulty selection screen and reset progress
+  gameStarted.value = false
+  progress.value = 0
+  isCorrect.value = null
+  currentWord.value = ''
+  // clear selections and letter queue
+  resetSelections(0)
+  setQueue([])
 }
 
 // keyboard support
