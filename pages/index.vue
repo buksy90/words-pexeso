@@ -82,6 +82,40 @@
           </v-card-actions>
         </v-card>
       </v-col>
+      <v-col cols="12" md="6">
+        <v-card
+          class="game-card"
+          hover
+          elevation="4"
+          @click="$router.push('/listen-game')"
+        >
+          <v-card-title class="text-h4 pa-6">
+            <v-icon size="large" class="mr-2">mdi-headphones</v-icon>
+            Listening Game
+          </v-card-title>
+          <v-card-text class="pa-6">
+            <p class="text-h6 mb-4">
+              Listen to a spoken word and spell it by selecting letters in the correct order.
+            </p>
+            <ul class="text-body-1">
+              <li>Practice auditory word recognition</li>
+              <li>Select letters in sequence to form the word</li>
+              <li>Progress bar tracks success (max 10)</li>
+            </ul>
+          </v-card-text>
+          <v-card-actions class="pa-6 pt-0">
+            <v-btn
+              color="primary"
+              size="large"
+              prepend-icon="mdi-play"
+              block
+              :to="'/listen-game'"
+            >
+              Play Listening Game
+            </v-btn>
+          </v-card-actions>
+        </v-card>
+      </v-col>
     </v-row>
 
     <!-- Tech Stack Info -->
