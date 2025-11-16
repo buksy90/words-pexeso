@@ -2,11 +2,10 @@
   <v-app>
     <v-app-bar color="primary" prominent>
       <v-app-bar-nav-icon></v-app-bar-nav-icon>
-      <v-toolbar-title>
+      <v-toolbar-title @click="$router.push('/')">
         Learning Games
       </v-toolbar-title>
       <v-spacer></v-spacer>
-      <v-btn to="/" variant="text" prepend-icon="mdi-home">Home</v-btn>
       <v-btn to="/game" variant="text" prepend-icon="mdi-cards">Pexeso</v-btn>
       <v-btn to="/spell-game" variant="text" prepend-icon="mdi-image-text">Spell Game</v-btn>
       <v-btn to="/setup" variant="text" prepend-icon="mdi-cog">Setup</v-btn>

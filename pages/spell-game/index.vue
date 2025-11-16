@@ -63,48 +63,38 @@
 
     <!-- Game Screen -->
     <template v-else>
-      <!-- Progress Bar -->
-      <v-card class="mb-4" variant="outlined">
-        <v-card-text class="pb-2">
-          <div class="d-flex justify-space-between align-center mb-2">
-            <span class="text-subtitle-1 font-weight-bold">Progress</span>
-            <span class="text-subtitle-2">{{ completedWordsCount }} / {{ totalWords }} words</span>
-          </div>
-          <v-progress-linear
-            :model-value="progressPercentage"
-            color="success"
-            height="12"
-            rounded
-          >
-            <template v-slot:default>
-              <strong class="text-caption">{{ progressPercentage }}%</strong>
-            </template>
-          </v-progress-linear>
-        </v-card-text>
-      </v-card>
-
       <!-- Game Stats -->
       <v-row class="mb-6">
-        <v-col cols="12" sm="3">
+        <v-col cols="12" md="2">
           <v-card variant="outlined" class="pa-4">
             <div class="text-subtitle-1">Score</div>
             <div class="text-h5">{{ score }}</div>
           </v-card>
         </v-col>
-        <v-col cols="12" sm="3">
+        <v-col cols="12" md="2">
           <v-card variant="outlined" class="pa-4">
-            <div class="text-subtitle-1">Attempts</div>
-            <div class="text-h5">{{ attempts }}</div>
+            <div class="text-subtitle-1">Potential Points</div>
+            <div class="text-h5">{{ potentialPoints }}</div>
           </v-card>
         </v-col>
-        <v-col cols="12" sm="3">
-          <v-card variant="outlined" class="pa-4" color="success" v-if="isCorrect === null">
-            <div class="text-subtitle-1">Potential Points</div>
-            <div class="text-h5">{{ potentialPoints }}</div>
-          </v-card>
-          <v-card variant="outlined" class="pa-4" v-else>
-            <div class="text-subtitle-1">Potential Points</div>
-            <div class="text-h5">{{ potentialPoints }}</div>
+        <v-col cols="12" md="3">
+          <!-- Progress Bar -->
+          <v-card class="mb-4" variant="outlined">
+            <v-card-text class="pb-2">
+              <div class="d-flex justify-space-between align-center mb-2">
+                <span class="text-subtitle-1">Progress</span>
+              </div>
+              <v-progress-linear
+                :model-value="progressPercentage"
+                color="success"
+                height="32"
+                rounded
+              >
+                <template v-slot:default>
+                  <strong class="text-caption">{{ completedWordsCount }} / {{ totalWords }} words</strong>
+                </template>
+              </v-progress-linear>
+            </v-card-text>
           </v-card>
         </v-col>
         <v-col cols="12" sm="3" class="d-flex align-center justify-end">
