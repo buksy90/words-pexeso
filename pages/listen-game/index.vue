@@ -95,28 +95,6 @@
               </div>
             </div>
 
-            <div class="text-center mb-6">
-              <h3 class="text-h6 mb-3">Your Word:</h3>
-              <div class="selected-letters-container">
-                <div
-                  v-for="(tile, index) in selectedLetters"
-                  :key="`pos-${index}`"
-                  class="letter-tile"
-                  :class="{
-                    'selected-tile': tile !== null,
-                    'empty-tile': tile === null,
-                    'next-position': index === getActivePosition() && isCorrect === null && tile === null,
-                    'correct-tile': isCorrect === true && tile !== null,
-                    'incorrect-tile': isCorrect === false && tile !== null,
-                    'clickable': isCorrect === null
-                  }"
-                  @click="handlePositionClick(index)"
-                >
-                  {{ tile?.letter ? tile.letter.toUpperCase() : '_' }}
-                </div>
-              </div>
-            </div>
-
             <v-alert v-if="isCorrect === true" type="success" variant="tonal" class="mb-4" prominent>
               <div class="text-h6">🎉 Correct! Progress increased.</div>
             </v-alert>
@@ -124,23 +102,11 @@
               <div class="text-h6">❌ Incorrect. Progress decreased.</div>
             </v-alert>
 
-            <div v-if="isCorrect === null" class="text-center mb-4">
-              <h3 class="text-h6 mb-3">Select Letters:</h3>
-              <div class="letter-queue">
-                <v-btn
-                  v-for="tile in letterQueue"
-                  :key="`queue-${tile.id}`"
-                  :disabled="tile.selected"
-                  :variant="tile.selected ? 'outlined' : 'elevated'"
-                  :color="tile.selected ? 'grey' : 'primary'"
-                  size="x-large"
-                  class="letter-queue-btn"
-                  @click="selectLetter(tile)"
-                >
-                  {{ tile.letter.toUpperCase() }}
-                </v-btn>
-              </div>
-            </div>
+            <LettersQueue
+              :word="currentWord"
+              :letters="lettersQueue"
+              @fullfilled="guess = $event"
+            />
 
             <div class="text-center mt-6">
               <v-btn v-if="isCorrect === null" color="success" size="large" prepend-icon="mdi-check" class="mr-2" @click="checkWord" :disabled="selectedLetters.length === 0">Check</v-btn>
@@ -160,7 +126,9 @@ import { ref, computed, onMounted, onBeforeUnmount } from 'vue'
 import { useWordSetup } from '~/composables/useWordSetup'
 import { useCharacters } from '~/composables/useCharacters'
 import { useLettersQueue, type LetterTile } from '~/composables/useLettersQueue'
+import { useLettersQueue2 } from '~/composables/useLettersQueue2'
 import { useSpeech } from '~/composables/useSpeech'
+import { useDifficulty } from '~/composables/useDifficulty'
 
 type Difficulty = 'easy' | 'medium' | 'hard'
 
@@ -173,7 +141,8 @@ const hasWords = computed(() => confirmedWords.value.length > 0)
 const { speak, availableVoices, selectedVoice } = useSpeech('listen_game_voice')
 
 // Game state
-const currentWord = ref('')
+const currentWord = ref(pickWord());
+const guess = ref('');
 const selectedLetters = ref<(LetterTile | null)[]>([])
 const isCorrect = ref<boolean | null>(null)
 const gameStarted = ref(false)
@@ -181,41 +150,38 @@ const difficulty = ref<Difficulty>('easy')
 const progress = ref(0)
 
 // reuse letters queue
-const { letterQueue, setQueue, availableLetters, selectLetter, removeSelectedLetter, setActivePosition, getActivePosition, resetSelections } = useLettersQueue(selectedLetters, isCorrect)
+//const { letterQueue, setQueue, availableLetters, selectLetter, removeSelectedLetter, setActivePosition, getActivePosition, resetSelections } = useLettersQueue(selectedLetters, isCorrect)
+const { letterQueue, setQueue, availableLetters, selectLetter, removeSelectedLetter, setActivePosition, getActivePosition, resetSelections } = useLettersQueue2(selectedLetters, isCorrect)
+const lettersQueue = computed(() => {
+  const { getPermittedLetters} = useDifficulty(difficulty.value);
+  return getPermittedLetters(currentWord.value);
+})
 
 const { active } = useCharacters()
 
-const getIncorrectLetters = (wordLetters: string[]): string[] => {
-  const incorrectCount = difficulty.value === 'medium' ? 2 : difficulty.value === 'hard' ? 5 : 0
-  if (incorrectCount === 0) return []
 
-  const wordLetterSet = new Set(wordLetters.map(l => l.toLowerCase()))
-  const availableChars = active.value.filter(char => !wordLetterSet.has(char.toLowerCase()))
-  // shuffle simple
-  const shuffled = availableChars.sort(() => Math.random() - 0.5)
-  return shuffled.slice(0, Math.min(incorrectCount, shuffled.length))
-}
 
-const initRound = (excludeCurrent = true) => {
-  if (!hasWords.value) return
+function pickWord(excludeCurrent = true): string {
   // pick random confirmed word; prefer a different word than current when possible
   let idx = Math.floor(Math.random() * confirmedWords.value.length)
   if (excludeCurrent && confirmedWords.value.length > 1) {
     let attempts = 0
     while (confirmedWords.value[idx] === currentWord.value && attempts < 50) {
       idx = Math.floor(Math.random() * confirmedWords.value.length)
-      attempts++
+      attempts++;
     }
   }
-  const word = confirmedWords.value[idx] || ''
-  currentWord.value = word
-  selectedLetters.value = Array(word.length).fill(null)
-  isCorrect.value = null
 
-  const letters = word.split('').map((letter, index) => ({ letter, id: index, selected: false } as LetterTile))
-  const incorrect = getIncorrectLetters(letters.map(l => l.letter))
-  const incorrectTiles = incorrect.map((letter, i) => ({ letter, id: letters.length + i, selected: false } as LetterTile))
-  setQueue([...letters, ...incorrectTiles])
+  const word = confirmedWords.value[idx];
+  if (!word) throw new Error('No confirmed words available');
+  return word;
+}
+
+const initRound = (excludeCurrent = true) => {
+  if (!hasWords.value) return
+
+  isCorrect.value = null
+  currentWord.value = pickWord(excludeCurrent)
 }
 
 const startGame = (selectedDifficulty: Difficulty = 'easy') => {
@@ -226,9 +192,7 @@ const startGame = (selectedDifficulty: Difficulty = 'easy') => {
 }
 
 const checkWord = () => {
-  const spelled = selectedLetters.value.map(t => t?.letter || '').join('')
-  if (!spelled) return
-  const correct = spelled === currentWord.value
+  const correct = guess.value === currentWord.value
   isCorrect.value = correct
   if (correct) {
     progress.value = Math.min(10, progress.value + 1)
@@ -242,22 +206,9 @@ const nextRound = () => {
   initRound()
 }
 
-const resetRound = () => {
-  resetSelections(currentWord.value.length)
-  isCorrect.value = null
-}
 
 const handleStartGame = (d: Difficulty) => startGame(d)
 
-const handlePositionClick = (index: number) => {
-  if (isCorrect.value !== null) return
-  const tile = selectedLetters.value[index]
-  if (tile !== null) {
-    removeSelectedLetter(index)
-  } else {
-    setActivePosition(index)
-  }
-}
 
 const handleListen = () => {
   if (currentWord.value) speak(currentWord.value)
@@ -286,46 +237,13 @@ const handleKeyPress = (event: KeyboardEvent) => {
     if (isCorrect.value === true) { nextRound(); return }
     if (isCorrect.value === null) { if (selectedLetters.value.length > 0) checkWord(); return }
   }
-  if (isCorrect.value !== null) return
-  const availableTile = letterQueue.value.find(tile => !tile.selected && tile.letter.toLowerCase() === key)
-  if (availableTile) selectLetter(availableTile)
 }
 
 onMounted(() => window.addEventListener('keydown', handleKeyPress))
 onBeforeUnmount(() => window.removeEventListener('keydown', handleKeyPress))
-
-// expose to template
-const selectedVoiceRef = selectedVoice
-
 </script>
 
 <style scoped>
-.selected-letters-container {
-  display: flex;
-  justify-content: center;
-  gap: 12px;
-  flex-wrap: wrap;
-  min-height: 80px;
-  align-items: center;
-}
-.letter-tile {
-  width: 60px;
-  height: 60px;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  font-size: 32px;
-  font-weight: bold;
-  border-radius: 8px;
-  transition: all 0.3s ease;
-}
-.selected-tile { background: #2196F3; color: white; border: 2px solid #1976D2; }
-.empty-tile { background: #f5f5f5; color: #9e9e9e; border: 2px dashed #bdbdbd; }
-.empty-tile.next-position { background: #E3F2FD; border: 2px dashed #2196F3; border-width: 3px; }
-.correct-tile { background: #4CAF50 !important; border-color: #388E3C !important; }
-.incorrect-tile { background: #f44336 !important; border-color: #d32f2f !important; }
-.letter-queue { display:flex; justify-content:center; gap:12px; flex-wrap:wrap }
-.letter-queue-btn { min-width:60px !important; min-height:60px !important; font-size:24px !important; font-weight:bold }
 .difficulty-card { cursor:pointer; transition: all .3s ease; height:100%; }
 .difficulty-card:hover { transform: translateY(-8px); }
 </style>
