@@ -105,7 +105,7 @@
                   :class="{
                     'selected-tile': tile !== null,
                     'empty-tile': tile === null,
-                    'next-position': index === activePosition && isCorrect === null && tile === null,
+                    'next-position': index === getActivePosition() && isCorrect === null && tile === null,
                     'correct-tile': isCorrect === true && tile !== null,
                     'incorrect-tile': isCorrect === false && tile !== null,
                     'clickable': isCorrect === null
@@ -177,12 +177,11 @@ const currentWord = ref('')
 const selectedLetters = ref<(LetterTile | null)[]>([])
 const isCorrect = ref<boolean | null>(null)
 const gameStarted = ref(false)
-const activePosition = ref(0)
 const difficulty = ref<Difficulty>('easy')
 const progress = ref(0)
 
 // reuse letters queue
-const { letterQueue, setQueue, availableLetters, selectLetter, removeSelectedLetter, setActivePosition, resetSelections } = useLettersQueue(selectedLetters, activePosition, isCorrect)
+const { letterQueue, setQueue, availableLetters, selectLetter, removeSelectedLetter, setActivePosition, getActivePosition, resetSelections } = useLettersQueue(selectedLetters, isCorrect)
 
 const { active } = useCharacters()
 
@@ -212,7 +211,6 @@ const initRound = (excludeCurrent = true) => {
   currentWord.value = word
   selectedLetters.value = Array(word.length).fill(null)
   isCorrect.value = null
-  activePosition.value = 0
 
   const letters = word.split('').map((letter, index) => ({ letter, id: index, selected: false } as LetterTile))
   const incorrect = getIncorrectLetters(letters.map(l => l.letter))

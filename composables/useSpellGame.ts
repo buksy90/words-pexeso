@@ -18,7 +18,6 @@ export const useSpellGame = (charactersComposable = useCharacters()) => {
   const attempts = ref(0)
   const score = ref(0)
   const gameStarted = ref(false)
-  const activePosition = ref(0)
   const difficulty = ref<Difficulty>('easy')
   const currentRoundAttempts = ref(0)
   const potentialPoints = ref(0)
@@ -42,7 +41,7 @@ export const useSpellGame = (charactersComposable = useCharacters()) => {
     removeSelectedLetter,
     setActivePosition,
     resetSelections,
-  } = useLettersQueue(selectedLetters, activePosition, isCorrect)
+  } = useLettersQueue(selectedLetters, isCorrect)
 
   /**
    * Get incorrect letters to add based on difficulty
@@ -94,7 +93,6 @@ export const useSpellGame = (charactersComposable = useCharacters()) => {
     currentThing.value = thing
     selectedLetters.value = Array(thing.word.length).fill(null)
     isCorrect.value = null
-    activePosition.value = 0
     currentRoundAttempts.value = 0
 
     // Calculate potential points based on word length and difficulty bonus
@@ -134,26 +132,6 @@ export const useSpellGame = (charactersComposable = useCharacters()) => {
     totalWords.value = getThingsCountByDifficulty(selectedDifficulty)
     initRound()
   }
-
-  /**
-   * Select a letter from the queue
-   */
-  // letter selection logic moved to `useLettersQueue`
-
-  /**
-   * Remove the last selected letter
-   */
-  // undo logic moved to `useLettersQueue`
-
-  /**
-   * Remove a specific selected letter by clicking on it
-   */
-  // removeSelectedLetter moved to `useLettersQueue`
-
-  /**
-   * Set the active position where next letter will be placed
-   */
-  // setActivePosition moved to `useLettersQueue`
 
   /**
    * Check if the spelled word is correct
@@ -215,7 +193,6 @@ export const useSpellGame = (charactersComposable = useCharacters()) => {
     attempts: computed(() => attempts.value),
     score: computed(() => score.value),
     gameStarted: computed(() => gameStarted.value),
-    activePosition: computed(() => activePosition.value),
     difficulty: computed(() => difficulty.value),
     potentialPoints: computed(() => potentialPoints.value),
     completedWordsCount: computed(() => completedWords.value.size),

@@ -11,16 +11,15 @@ export interface LetterTile {
 
 export const useLettersQueue = (
   selectedLetters: Ref<(LetterTile | null)[]>,
-  activePosition: Ref<number>,
   isCorrect: Ref<boolean | null>
 ) => {
+  const activePosition = ref(0);
   const letterQueue = ref<LetterTile[]>([])
+  const availableLetters = computed(() => letterQueue.value.filter(t => !t.selected))
 
   const setQueue = (tiles: LetterTile[]) => {
     letterQueue.value = shuffleArray([...tiles])
   }
-
-  const availableLetters = computed(() => letterQueue.value.filter(t => !t.selected))
 
   const selectLetter = (tile: LetterTile) => {
     if (tile.selected || isCorrect.value !== null) return
@@ -83,6 +82,7 @@ export const useLettersQueue = (
     selectLetter,
     removeSelectedLetter,
     setActivePosition,
+    getActivePosition: () => activePosition.value,
     resetSelections,
   }
 }
