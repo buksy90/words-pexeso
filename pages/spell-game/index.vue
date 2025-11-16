@@ -333,9 +333,38 @@ const handleListen = () => {
 
 // Keyboard event handler
 const handleKeyPress = (event: KeyboardEvent) => {
-  if (!gameStarted.value || isCorrect.value !== null) return
+  if (!gameStarted.value) return
 
   const key = event.key.toLowerCase()
+
+  // Pressing Enter should act depending on current result state
+  if (key === 'enter') {
+    // prevent default browser behaviour (forms, buttons)
+    event.preventDefault()
+
+    // If an error is shown, Enter should act as "Try Again"
+    if (isCorrect.value === false) {
+      resetRound()
+      return
+    }
+
+    // If the answer was correct, Enter should move to the next word
+    if (isCorrect.value === true) {
+      nextRound()
+      return
+    }
+
+    // If game is ongoing (no result yet), Enter should submit the guess
+    if (isCorrect.value === null) {
+      if (selectedLetters.value.length > 0) {
+        checkWord()
+      }
+      return
+    }
+  }
+
+  // If a result is shown (correct/incorrect), ignore other keys
+  if (isCorrect.value !== null) return
 
   // Find the first available (not selected) letter tile that matches the pressed key
   const availableTile = letterQueue.value.find(
