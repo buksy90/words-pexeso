@@ -4,24 +4,15 @@
  * Players see an image and must select letters in correct order to spell the word.
  */
 
-import { ref, computed, watch } from 'vue'
-import { useThings, type Thing } from './useThings'
+import { ref, computed } from 'vue'
+import { useThings, type Thing, type Difficulty } from './useThings'
 import { useCharacters } from './useCharacters'
-
-export type Difficulty = 'easy' | 'medium' | 'hard'
-
-export interface LetterTile {
-  letter: string
-  id: number
-  selected: boolean
-}
+import { useLettersQueue } from './useLettersQueue'
+import { shuffleArray } from './helpers'
 
 export const useSpellGame = () => {
-  const { getRandomThing } = useThings()
-
   // Game state
   const currentThing = ref<Thing | null>(null)
-  const letterQueue = ref<LetterTile[]>([])
   const selectedLetters = ref<(LetterTile | null)[]>([])
   const isCorrect = ref<boolean | null>(null)
   const attempts = ref(0)
@@ -42,23 +33,16 @@ export const useSpellGame = () => {
   const isComplete = computed(() =>
     selectedLetters.value.filter(t => t !== null).length === targetWord.value.length
   )
-  const availableLetters = computed(() =>
-    letterQueue.value.filter(tile => !tile.selected)
-  )
-
-  /**
-   * Shuffle an array using Fisher-Yates algorithm
-   */
-  const shuffleArray = <T>(array: T[]): T[] => {
-    const shuffled = [...array]
-    for (let i = shuffled.length - 1; i > 0; i--) {
-      const j = Math.floor(Math.random() * (i + 1))
-      const temp = shuffled[i]!
-      shuffled[i] = shuffled[j]!
-      shuffled[j] = temp
-    }
-    return shuffled
-  }
+  // letter queue and selection helpers are extracted to composable
+  const {
+    letterQueue,
+    setQueue,
+    availableLetters,
+    selectLetter,
+    removeSelectedLetter,
+    setActivePosition,
+    resetSelections,
+  } = useLettersQueue(selectedLetters, activePosition, isCorrect)
 
   /**
    * Get incorrect letters to add based on difficulty
@@ -133,8 +117,8 @@ export const useSpellGame = () => {
       selected: false,
     }))
 
-    // Combine and shuffle all letters
-    letterQueue.value = shuffleArray([...letters, ...incorrectTiles])
+    // Combine and shuffle all letters via letters queue composable
+    setQueue([...letters, ...incorrectTiles])
     gameStarted.value = true
   }
 
@@ -154,74 +138,22 @@ export const useSpellGame = () => {
   /**
    * Select a letter from the queue
    */
-  const selectLetter = (tile: LetterTile) => {
-    if (tile.selected || isCorrect.value !== null) return
-    if (activePosition.value >= selectedLetters.value.length) return
-
-    // Mark as selected and place at active position
-    tile.selected = true
-    selectedLetters.value[activePosition.value] = tile
-
-    // Move to next empty position
-    for (let i = activePosition.value + 1; i < selectedLetters.value.length; i++) {
-      if (selectedLetters.value[i] === null) {
-        activePosition.value = i
-        return
-      }
-    }
-    // If no empty position found after current, check from beginning
-    for (let i = 0; i < activePosition.value; i++) {
-      if (selectedLetters.value[i] === null) {
-        activePosition.value = i
-        return
-      }
-    }
-  }
+  // letter selection logic moved to `useLettersQueue`
 
   /**
    * Remove the last selected letter
    */
-  const undoLastLetter = () => {
-    if (isCorrect.value !== null) return
-
-    // Find last non-null letter
-    for (let i = selectedLetters.value.length - 1; i >= 0; i--) {
-      if (selectedLetters.value[i] !== null) {
-        const tile = selectedLetters.value[i]
-        if (tile) {
-          tile.selected = false
-          selectedLetters.value[i] = null
-          activePosition.value = i
-        }
-        return
-      }
-    }
-  }
+  // undo logic moved to `useLettersQueue`
 
   /**
    * Remove a specific selected letter by clicking on it
    */
-  const removeSelectedLetter = (index: number) => {
-    if (isCorrect.value !== null) return
-    if (index < 0 || index >= selectedLetters.value.length) return
-
-    const tile = selectedLetters.value[index]
-    if (tile) {
-      tile.selected = false
-      selectedLetters.value[index] = null
-      activePosition.value = index
-    }
-  }
+  // removeSelectedLetter moved to `useLettersQueue`
 
   /**
    * Set the active position where next letter will be placed
    */
-  const setActivePosition = (position: number) => {
-    if (isCorrect.value !== null) return
-    if (position >= 0 && position < selectedLetters.value.length) {
-      activePosition.value = position
-    }
-  }
+  // setActivePosition moved to `useLettersQueue`
 
   /**
    * Check if the spelled word is correct
@@ -260,15 +192,10 @@ export const useSpellGame = () => {
    * Reset the current round
    */
   const resetRound = () => {
-    selectedLetters.value.forEach(tile => {
-      if (tile) {
-        tile.selected = false
-      }
-    })
+    // Clear selections using letters queue composable and reset state
     const wordLength = targetWord.value.length
-    selectedLetters.value = Array(wordLength).fill(null)
+    resetSelections(wordLength)
     isCorrect.value = null
-    activePosition.value = 0
     // Keep potentialPoints as it decreases with each failed attempt
   }
 
@@ -307,7 +234,6 @@ export const useSpellGame = () => {
     startGame,
     initRound,
     selectLetter,
-    undoLastLetter,
     removeSelectedLetter,
     setActivePosition,
     checkWord,

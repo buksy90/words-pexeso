@@ -2,8 +2,8 @@
   <v-app>
     <v-app-bar color="primary" prominent>
       <v-app-bar-nav-icon></v-app-bar-nav-icon>
-      <v-toolbar-title @click="$router.push('/')">
-        Learning Games
+      <v-toolbar-title>
+        <v-btn to="/" variant="text">Learning Games</v-btn>
       </v-toolbar-title>
       <v-spacer></v-spacer>
       <v-btn to="/game" variant="text" prepend-icon="mdi-cards">Pexeso</v-btn>

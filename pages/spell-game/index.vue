@@ -225,17 +225,6 @@
               </v-btn>
               <v-btn
                 v-if="isCorrect === null"
-                color="warning"
-                variant="outlined"
-                prepend-icon="mdi-undo"
-                class="mr-2"
-                @click="undoLastLetter"
-                :disabled="selectedLetters.length === 0"
-              >
-                Undo
-              </v-btn>
-              <v-btn
-                v-if="isCorrect === null"
                 color="error"
                 variant="outlined"
                 prepend-icon="mdi-refresh"
@@ -271,8 +260,9 @@
 </template>
 
 <script setup lang="ts">
-import { useSpellGame, type Difficulty } from '~/composables/useSpellGame'
+import { useSpellGame } from '~/composables/useSpellGame'
 import { useSpeech } from '~/composables/useSpeech'
+import { type Difficulty } from '~/composables/useThings'
 
 const {
   // State
@@ -294,7 +284,6 @@ const {
   // Actions
   startGame,
   selectLetter,
-  undoLastLetter,
   removeSelectedLetter,
   setActivePosition,
   checkWord,
